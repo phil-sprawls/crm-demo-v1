@@ -21,25 +21,27 @@ search_term = st.text_input("🔍 Search accounts by team, business area, VP, ad
 accounts = search_accounts(search_term)
 
 if accounts:
-    # Convert to DataFrame for better display
-    accounts_data = []
-    for account in accounts:
-        accounts_data.append({
-            'Team': account['team'],
-            'Business Area': account['business_area'],
-            'VP': account['vp'],
-            'Admin': account['admin'],
-            'Primary IT Partner': account['primary_it_partner'],
-            'BSNID': account['bsnid']
-        })
-    
-    df = pd.DataFrame(accounts_data)
-    
     # Display accounts table
     st.subheader(f"📋 Accounts ({len(accounts)} found)")
     
-    # Create clickable rows
-    for idx, account in enumerate(accounts):
+    # Table header
+    col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 2, 2, 1])
+    with col1:
+        st.markdown("**Team**")
+    with col2:
+        st.markdown("**Business Area**")
+    with col3:
+        st.markdown("**VP**")
+    with col4:
+        st.markdown("**Admin**")
+    with col5:
+        st.markdown("**Primary IT Partner**")
+    with col6:
+        st.markdown("**Action**")
+    st.markdown("---")
+    
+    # Display accounts data
+    for account in accounts:
         col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 2, 2, 1])
         
         with col1:
@@ -56,46 +58,6 @@ if accounts:
             if st.button("View", key=f"view_{account['bsnid']}", help="View account details"):
                 st.session_state.selected_account = account['bsnid']
                 st.switch_page("pages/1_Account_Details.py")
-        
-        if idx == 0:
-            # Header row
-            st.markdown("---")
-    
-    # Show the header after the first row
-    if accounts:
-        col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 2, 2, 1])
-        with col1:
-            st.markdown("**Team**")
-        with col2:
-            st.markdown("**Business Area**")
-        with col3:
-            st.markdown("**VP**")
-        with col4:
-            st.markdown("**Admin**")
-        with col5:
-            st.markdown("**Primary IT Partner**")
-        with col6:
-            st.markdown("**Action**")
-        st.markdown("---")
-        
-        # Re-display the data with proper formatting
-        for idx, account in enumerate(accounts):
-            col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 2, 2, 1])
-            
-            with col1:
-                st.write(account['team'])
-            with col2:
-                st.write(account['business_area'])
-            with col3:
-                st.write(account['vp'])
-            with col4:
-                st.write(account['admin'])
-            with col5:
-                st.write(account['primary_it_partner'])
-            with col6:
-                if st.button("View", key=f"view_btn_{account['bsnid']}", help="View account details"):
-                    st.session_state.selected_account = account['bsnid']
-                    st.switch_page("pages/1_Account_Details.py")
 
 else:
     if search_term:

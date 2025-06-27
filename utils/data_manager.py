@@ -4,6 +4,7 @@ from datetime import datetime
 
 def initialize_data():
     """Initialize the data structures in session state if not already present"""
+    # Initialize all session state variables first
     if 'accounts' not in st.session_state:
         st.session_state.accounts = {}
     
@@ -26,6 +27,74 @@ def initialize_data():
     
     if 'enablement_tiers' not in st.session_state:
         st.session_state.enablement_tiers = ['Tier 1', 'Tier 2', 'Tier 3', 'None']
+    
+    # Check if sample data needs to be added (only if accounts is empty)
+    if not st.session_state.accounts and 'sample_data_loaded' not in st.session_state:
+        _add_sample_data()
+        st.session_state.sample_data_loaded = True
+
+def _add_sample_data():
+    """Add sample data for demonstration purposes"""
+    # Sample accounts
+    sample_accounts = [
+        {
+            'team': 'Analytics Team',
+            'business_area': 'Finance',
+            'vp': 'Jennifer Walsh',
+            'admin': 'Mark Thompson',
+            'primary_it_partner': 'John Smith',
+            'platforms_status': {'Databricks': 'Completed', 'Snowflake': 'In Progress'}
+        },
+        {
+            'team': 'Sales Analytics',
+            'business_area': 'Marketing',
+            'vp': 'Robert Kim',
+            'admin': 'Sarah Chen',
+            'primary_it_partner': 'Sarah Johnson',
+            'platforms_status': {'Power Platform': 'Requested', 'Databricks': 'In Progress'}
+        },
+        {
+            'team': 'Operations Intelligence',
+            'business_area': 'Operations',
+            'vp': 'David Rodriguez',
+            'admin': 'Lisa Wang',
+            'primary_it_partner': 'Mike Davis',
+            'platforms_status': {'Snowflake': 'Completed'}
+        }
+    ]
+    
+    for account_data in sample_accounts:
+        bsnid = add_account(
+            account_data['team'],
+            account_data['business_area'], 
+            account_data['vp'],
+            account_data['admin'],
+            account_data['primary_it_partner'],
+            account_data['platforms_status']
+        )
+        
+        # Add sample use cases for each account
+        if account_data['team'] == 'Analytics Team':
+            add_use_case(bsnid, 
+                        "Financial reporting takes too long to generate",
+                        "Implement automated reporting dashboard using Databricks",
+                        "Mark Thompson",
+                        "Active",
+                        "Tier 1")
+        elif account_data['team'] == 'Sales Analytics':
+            add_use_case(bsnid,
+                        "Sales forecasting accuracy is below 70%",
+                        "Build ML-powered forecasting model with real-time data",
+                        "Sarah Chen", 
+                        "Planning",
+                        "Tier 2")
+        elif account_data['team'] == 'Operations Intelligence':
+            add_use_case(bsnid,
+                        "Supply chain visibility is limited",
+                        "Create real-time tracking dashboard for inventory and logistics",
+                        "Lisa Wang",
+                        "Completed", 
+                        "Tier 1")
 
 def add_account(team, business_area, vp, admin, primary_it_partner, platforms_status=None):
     """Add a new account to the system"""
