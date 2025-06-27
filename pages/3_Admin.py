@@ -58,7 +58,7 @@ with tab1:
         if st.form_submit_button("Update IT Partner", use_container_width=True):
             if new_partner:
                 update_primary_it_partner(business_area, new_partner)
-                st.success(f"IT Partner for {business_area} updated to {new_partner}")
+                st.success(f"✅ Primary IT Partner for {business_area} has been successfully updated to {new_partner}!")
                 st.rerun()
             else:
                 st.error("Please enter a partner name")
@@ -80,7 +80,7 @@ with tab1:
             if new_ba_name and new_ba_partner:
                 if new_ba_name not in st.session_state.business_areas:
                     st.session_state.business_areas[new_ba_name] = new_ba_partner
-                    st.success(f"Business Area '{new_ba_name}' added with IT Partner '{new_ba_partner}'")
+                    st.success(f"✅ Business Area '{new_ba_name}' has been successfully created with IT Partner '{new_ba_partner}'!")
                     st.rerun()
                 else:
                     st.error("Business Area already exists")
@@ -127,7 +127,7 @@ with tab2:
         if submitted:
             if team_name and business_area and vp_name and admin_name and it_partner:
                 bsnid = add_account(team_name, business_area, vp_name, admin_name, it_partner, selected_platforms)
-                st.success(f"Account created successfully! BSNID: {bsnid}")
+                st.success(f"✅ New account '{team_name}' has been successfully created! You can now find it in the All Accounts screen.")
                 st.balloons()
                 st.rerun()
             else:
@@ -163,7 +163,8 @@ with tab3:
             if st.form_submit_button("Create Use Case", use_container_width=True):
                 if problem and solution and leader:
                     use_case_id = add_use_case(selected_account, problem, solution, leader, status, enablement_tier)
-                    st.success(f"Use case created successfully! ID: {use_case_id}")
+                    account_name = st.session_state.accounts[selected_account]['team']
+                    st.success(f"✅ New use case has been successfully created and added to {account_name}!")
                     st.balloons()
                     st.rerun()
                 else:
@@ -207,7 +208,8 @@ with tab4:
                     
                     if st.form_submit_button("Add Platform", use_container_width=True):
                         add_platform_to_account(selected_account, platform, status)
-                        st.success(f"Platform {platform} added to account!")
+                        account_name = st.session_state.accounts[selected_account]['team']
+                        st.success(f"✅ {platform} platform has been successfully added to {account_name} with status '{status}'!")
                         st.rerun()
                 else:
                     st.info("All platforms are already added to this account.")

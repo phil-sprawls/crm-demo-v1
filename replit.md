@@ -118,7 +118,9 @@ This is a Streamlit-based Customer Relationship Management (CRM) system designed
 ## Changelog
 
 - June 27, 2025. Initial setup
+- June 27, 2025. Fixed duplicate account display issue and added comprehensive confirmation messages for all user actions
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+User feedback preferences: Show clear confirmation messages when saving any new data across all forms and actions.

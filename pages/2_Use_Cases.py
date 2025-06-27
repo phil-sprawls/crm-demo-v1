@@ -24,6 +24,7 @@ st.markdown("---")
 
 # Check if editing a specific use case
 edit_mode = False
+use_case_to_edit = None
 if 'edit_use_case_id' in st.session_state and st.session_state.edit_use_case_id in st.session_state.use_cases:
     edit_mode = True
     use_case_to_edit = st.session_state.use_cases[st.session_state.edit_use_case_id]
@@ -47,9 +48,9 @@ with st.form("use_case_form"):
             account_options = {bsnid: f"{acc['team']} ({acc['business_area']})" 
                             for bsnid, acc in st.session_state.accounts.items()}
             if account_options:
-                if edit_mode:
+                if edit_mode and use_case_to_edit:
                     # Find the current account for the use case
-                    current_account = use_case_to_edit['account_bsnid']
+                    current_account = use_case_to_edit.get('account_bsnid', '')
                     current_index = list(account_options.keys()).index(current_account) if current_account in account_options else 0
                     selected_account = st.selectbox("Select Account", 
                                                   options=list(account_options.keys()),
@@ -65,26 +66,26 @@ with st.form("use_case_form"):
         
         # Problem description
         problem = st.text_area("Problem Description", 
-                             value=use_case_to_edit['problem'] if edit_mode else "",
+                             value=use_case_to_edit['problem'] if edit_mode and use_case_to_edit else "",
                              height=100,
                              help="Describe the business problem or challenge")
         
         # Solution description
         solution = st.text_area("Solution Description", 
-                              value=use_case_to_edit['solution'] if edit_mode else "",
+                              value=use_case_to_edit['solution'] if edit_mode and use_case_to_edit else "",
                               height=100,
                               help="Describe the proposed or implemented solution")
     
     with col2:
         # Leader
         leader = st.text_input("Leader", 
-                             value=use_case_to_edit['leader'] if edit_mode else "",
+                             value=use_case_to_edit['leader'] if edit_mode and use_case_to_edit else "",
                              help="Person responsible for this use case")
         
         # Status
         status_options = ["Active", "Completed", "On Hold", "Cancelled", "Planning"]
         current_status_index = 0
-        if edit_mode and use_case_to_edit['status'] in status_options:
+        if edit_mode and use_case_to_edit and use_case_to_edit['status'] in status_options:
             current_status_index = status_options.index(use_case_to_edit['status'])
         
         status = st.selectbox("Status", 
@@ -93,7 +94,7 @@ with st.form("use_case_form"):
         
         # Enablement Tier
         tier_index = 0
-        if edit_mode and use_case_to_edit['enablement_tier'] in st.session_state.enablement_tiers:
+        if edit_mode and use_case_to_edit and use_case_to_edit['enablement_tier'] in st.session_state.enablement_tiers:
             tier_index = st.session_state.enablement_tiers.index(use_case_to_edit['enablement_tier'])
         
         enablement_tier = st.selectbox("Enablement Tier", 
@@ -120,12 +121,13 @@ with st.form("use_case_form"):
         if problem and solution and leader:
             if edit_mode:
                 update_use_case(st.session_state.edit_use_case_id, problem, solution, leader, status, enablement_tier)
-                st.success("Use case updated successfully!")
+                st.success("✅ Use case has been successfully updated with your changes!")
                 if 'edit_use_case_id' in st.session_state:
                     del st.session_state.edit_use_case_id
             else:
                 use_case_id = add_use_case(selected_account, problem, solution, leader, status, enablement_tier)
-                st.success(f"Use case added successfully! ID: {use_case_id}")
+                account_name = st.session_state.accounts[selected_account]['team']
+                st.success(f"✅ New use case has been successfully created and added to {account_name}!")
                 if 'selected_account_for_use_case' in st.session_state:
                     del st.session_state.selected_account_for_use_case
             st.rerun()

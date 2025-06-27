@@ -62,8 +62,10 @@ with col2:
         if st.button("Add Azure DevOps Link"):
             if new_azure_link:
                 add_azure_devops_link(account['bsnid'], new_azure_link)
-                st.success("Azure DevOps link added!")
+                st.success("✅ Azure DevOps link has been successfully added to this account!")
                 st.rerun()
+            else:
+                st.error("Please enter a valid URL before adding the link.")
     
     st.markdown("---")
     
@@ -81,8 +83,10 @@ with col2:
         if st.button("Add Artifacts Folder Link"):
             if new_artifacts_link:
                 add_artifacts_folder_link(account['bsnid'], new_artifacts_link)
-                st.success("Artifacts folder link added!")
+                st.success("✅ Artifacts folder link has been successfully added to this account!")
                 st.rerun()
+            else:
+                st.error("Please enter a valid URL before adding the link.")
 
 st.markdown("---")
 
@@ -116,7 +120,7 @@ with platforms_col2:
             new_platform_status = st.selectbox("Initial Status", st.session_state.onboarding_statuses, key="new_platform_status")
             if st.button("Add Platform"):
                 add_platform_to_account(account['bsnid'], new_platform, new_platform_status)
-                st.success(f"Platform {new_platform} added!")
+                st.success(f"✅ {new_platform} platform has been successfully added with status '{new_platform_status}'!")
                 st.rerun()
         else:
             st.write("All platforms already added")
@@ -128,7 +132,7 @@ with platforms_col2:
             new_status = st.selectbox("New Status", st.session_state.onboarding_statuses, key="update_status")
             if st.button("Update Status"):
                 update_platform_status(account['bsnid'], platform_to_update, new_status)
-                st.success(f"Platform {platform_to_update} status updated!")
+                st.success(f"✅ {platform_to_update} status has been successfully updated to '{new_status}'!")
                 st.rerun()
 
 st.markdown("---")
