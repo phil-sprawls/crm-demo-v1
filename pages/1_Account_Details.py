@@ -17,6 +17,11 @@ initialize_data()
 
 st.title("📄 Account Details")
 
+# Show persistent success message if exists
+if 'account_success_message' in st.session_state:
+    st.success(st.session_state.account_success_message)
+    del st.session_state.account_success_message
+
 # Check if an account is selected
 if 'selected_account' not in st.session_state or st.session_state.selected_account not in st.session_state.accounts:
     st.error("No account selected. Please go back to All Accounts and select an account.")
@@ -120,7 +125,7 @@ with platforms_col2:
             new_platform_status = st.selectbox("Initial Status", st.session_state.onboarding_statuses, key="new_platform_status")
             if st.button("Add Platform"):
                 add_platform_to_account(account['bsnid'], new_platform, new_platform_status)
-                st.success(f"✅ {new_platform} platform has been successfully added with status '{new_platform_status}'!")
+                st.session_state.account_success_message = f"✅ {new_platform} platform has been successfully added with status '{new_platform_status}'!"
                 st.rerun()
         else:
             st.write("All platforms already added")
@@ -132,7 +137,7 @@ with platforms_col2:
             new_status = st.selectbox("New Status", st.session_state.onboarding_statuses, key="update_status")
             if st.button("Update Status"):
                 update_platform_status(account['bsnid'], platform_to_update, new_status)
-                st.success(f"✅ {platform_to_update} status has been successfully updated to '{new_status}'!")
+                st.session_state.account_success_message = f"✅ {platform_to_update} status has been successfully updated to '{new_status}'!"
                 st.rerun()
 
 st.markdown("---")

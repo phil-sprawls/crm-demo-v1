@@ -16,6 +16,11 @@ initialize_data()
 
 st.title("💡 Use Cases Management")
 
+# Show persistent success message if exists
+if 'use_case_success_message' in st.session_state:
+    st.success(st.session_state.use_case_success_message)
+    del st.session_state.use_case_success_message
+
 # Back button
 if st.button("← Back to All Accounts"):
     st.switch_page("app.py")
@@ -121,13 +126,13 @@ with st.form("use_case_form"):
         if problem and solution and leader:
             if edit_mode:
                 update_use_case(st.session_state.edit_use_case_id, problem, solution, leader, status, enablement_tier)
-                st.success("✅ Use case has been successfully updated with your changes!")
+                st.session_state.use_case_success_message = "✅ Use case has been successfully updated with your changes!"
                 if 'edit_use_case_id' in st.session_state:
                     del st.session_state.edit_use_case_id
             else:
                 use_case_id = add_use_case(selected_account, problem, solution, leader, status, enablement_tier)
                 account_name = st.session_state.accounts[selected_account]['team']
-                st.success(f"✅ New use case has been successfully created and added to {account_name}!")
+                st.session_state.use_case_success_message = f"✅ New use case has been successfully created and added to {account_name}!"
                 if 'selected_account_for_use_case' in st.session_state:
                     del st.session_state.selected_account_for_use_case
             st.rerun()

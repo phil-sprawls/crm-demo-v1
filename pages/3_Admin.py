@@ -17,6 +17,12 @@ initialize_data()
 
 st.title("⚙️ Admin Panel")
 
+# Show persistent success message if exists
+if 'admin_success_message' in st.session_state:
+    st.success(st.session_state.admin_success_message)
+    # Clear the message after showing it
+    del st.session_state.admin_success_message
+
 # Back button
 if st.button("← Back to All Accounts"):
     st.switch_page("app.py")
@@ -58,7 +64,7 @@ with tab1:
         if st.form_submit_button("Update IT Partner", use_container_width=True):
             if new_partner:
                 update_primary_it_partner(business_area, new_partner)
-                st.success(f"✅ Primary IT Partner for {business_area} has been successfully updated to {new_partner}!")
+                st.session_state.admin_success_message = f"✅ Primary IT Partner for {business_area} has been successfully updated to {new_partner}!"
                 st.rerun()
             else:
                 st.error("Please enter a partner name")
@@ -127,7 +133,8 @@ with tab2:
         if submitted:
             if team_name and business_area and vp_name and admin_name and it_partner:
                 bsnid = add_account(team_name, business_area, vp_name, admin_name, it_partner, selected_platforms)
-                st.success(f"✅ New account '{team_name}' has been successfully created! You can now find it in the All Accounts screen.")
+                # Store success message to show after page refresh
+                st.session_state.admin_success_message = f"✅ New account '{team_name}' has been successfully created! You can now find it in the All Accounts screen."
                 st.balloons()
                 st.rerun()
             else:
@@ -164,7 +171,7 @@ with tab3:
                 if problem and solution and leader:
                     use_case_id = add_use_case(selected_account, problem, solution, leader, status, enablement_tier)
                     account_name = st.session_state.accounts[selected_account]['team']
-                    st.success(f"✅ New use case has been successfully created and added to {account_name}!")
+                    st.session_state.admin_success_message = f"✅ New use case has been successfully created and added to {account_name}!"
                     st.balloons()
                     st.rerun()
                 else:
