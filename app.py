@@ -4,25 +4,25 @@ from utils.data_manager import initialize_data, search_accounts, add_account
 
 # Page configuration
 st.set_page_config(
-    page_title="CRM System",
-    page_icon="🏢",
+    page_title="EDIP CRM",
+    page_icon="📊",
     layout="wide"
 )
 
 # Initialize data
 initialize_data()
 
-st.title("🏢 CRM System - All Accounts")
+st.title("EDIP CRM - All Accounts")
 
 # Search functionality
-search_term = st.text_input("🔍 Search accounts by team, business area, VP, admin, or IT partner", "")
+search_term = st.text_input("Search accounts by team, business area, VP, admin, or IT partner", "")
 
 # Get filtered accounts
 accounts = search_accounts(search_term)
 
 if accounts:
     # Display accounts table
-    st.subheader(f"📋 Accounts ({len(accounts)} found)")
+    st.subheader(f"Accounts ({len(accounts)} found)")
     
     # Table header
     col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 2, 2, 1])
@@ -67,24 +67,24 @@ else:
 
 # Quick actions
 st.markdown("---")
-st.subheader("🚀 Quick Actions")
+st.subheader("Quick Actions")
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    if st.button("➕ Add New Account", use_container_width=True):
+    if st.button("Add New Account", use_container_width=True):
         st.switch_page("pages/3_Admin.py")
 
 with col2:
-    if st.button("📊 Manage Use Cases", use_container_width=True):
+    if st.button("Manage Use Cases", use_container_width=True):
         st.switch_page("pages/2_Use_Cases.py")
 
 with col3:
-    if st.button("⚙️ Admin Panel", use_container_width=True):
+    if st.button("Admin Panel", use_container_width=True):
         st.switch_page("pages/3_Admin.py")
 
 # Navigation info
-st.sidebar.title("📋 Navigation")
+st.sidebar.title("Navigation")
 st.sidebar.markdown("""
 - **All Accounts**: View and search all accounts
 - **Account Details**: View detailed information for a specific account
@@ -94,7 +94,7 @@ st.sidebar.markdown("""
 
 # System stats
 st.sidebar.markdown("---")
-st.sidebar.subheader("📈 System Stats")
+st.sidebar.subheader("System Stats")
 st.sidebar.metric("Total Accounts", len(st.session_state.accounts))
 st.sidebar.metric("Total Use Cases", len(st.session_state.use_cases))
 st.sidebar.metric("Business Areas", len(st.session_state.business_areas))

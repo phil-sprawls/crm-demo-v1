@@ -7,15 +7,15 @@ from utils.data_manager import (
 
 # Page configuration
 st.set_page_config(
-    page_title="Account Details - CRM System",
-    page_icon="📄",
+    page_title="Account Details - EDIP CRM",
+    page_icon="📊",
     layout="wide"
 )
 
 # Initialize data
 initialize_data()
 
-st.title("📄 Account Details")
+st.title("Account Details")
 
 # Show persistent success message if exists
 if 'account_success_message' in st.session_state:
@@ -42,7 +42,7 @@ st.markdown("---")
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader("📋 Basic Information")
+    st.subheader("Basic Information")
     st.write(f"**BSNID (UID):** {account['bsnid']}")
     st.write(f"**Team:** {account['team']}")
     st.write(f"**Business Area:** {account['business_area']}")
@@ -51,7 +51,7 @@ with col1:
     st.write(f"**Primary IT Partner:** {account['primary_it_partner']}")
 
 with col2:
-    st.subheader("🔗 External Links")
+    st.subheader("External Links")
     
     # Azure DevOps Links
     st.write("**Azure DevOps Support Tickets:**")
@@ -96,7 +96,7 @@ with col2:
 st.markdown("---")
 
 # Platforms and Onboarding Status
-st.subheader("🚀 Platforms & Onboarding Status")
+st.subheader("Platforms & Onboarding Status")
 
 platforms_col1, platforms_col2 = st.columns(2)
 
@@ -106,11 +106,11 @@ with platforms_col1:
         for platform, status in account['platforms_status'].items():
             # Color coding for status
             if status == 'Completed':
-                st.success(f"✅ {platform}: {status}")
+                st.success(f"{platform}: {status}")
             elif status == 'In Progress':
-                st.warning(f"🔄 {platform}: {status}")
+                st.warning(f"{platform}: {status}")
             else:  # Requested
-                st.info(f"📋 {platform}: {status}")
+                st.info(f"{platform}: {status}")
     else:
         st.write("No platforms configured")
 
@@ -143,7 +143,7 @@ with platforms_col2:
 st.markdown("---")
 
 # Use Cases
-st.subheader("💡 Use Cases")
+st.subheader("Use Cases")
 
 use_cases = get_account_use_cases(account['bsnid'])
 
@@ -188,20 +188,20 @@ st.markdown("---")
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    if st.button("➕ Add Use Case", use_container_width=True):
+    if st.button("Add Use Case", use_container_width=True):
         st.session_state.selected_account_for_use_case = account['bsnid']
         st.switch_page("pages/2_Use_Cases.py")
 
 with col2:
-    if st.button("📊 View All Use Cases", use_container_width=True):
+    if st.button("View All Use Cases", use_container_width=True):
         st.switch_page("pages/2_Use_Cases.py")
 
 with col3:
-    if st.button("⚙️ Admin Panel", use_container_width=True):
+    if st.button("Admin Panel", use_container_width=True):
         st.switch_page("pages/3_Admin.py")
 
 # Account summary sidebar
-st.sidebar.title("📊 Account Summary")
+st.sidebar.title("Account Summary")
 st.sidebar.write(f"**Account:** {account['team']}")
 st.sidebar.write(f"**Business Area:** {account['business_area']}")
 st.sidebar.metric("Platforms", len(account['platforms_status']))

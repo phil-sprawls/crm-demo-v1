@@ -7,15 +7,15 @@ from utils.data_manager import (
 
 # Page configuration
 st.set_page_config(
-    page_title="Admin Panel - CRM System",
-    page_icon="⚙️",
+    page_title="Admin Panel - EDIP CRM",
+    page_icon="📊",
     layout="wide"
 )
 
 # Initialize data
 initialize_data()
 
-st.title("⚙️ Admin Panel")
+st.title("Admin Panel")
 
 # Show persistent success message if exists
 if 'admin_success_message' in st.session_state:
@@ -30,11 +30,11 @@ if st.button("← Back to All Accounts"):
 st.markdown("---")
 
 # Tab navigation for admin functions
-tab1, tab2, tab3, tab4 = st.tabs(["👥 IT Partners", "🏢 Add Account", "💡 Add Use Case", "🚀 Add Platform"])
+tab1, tab2, tab3, tab4 = st.tabs(["IT Partners", "Add Account", "Add Use Case", "Add Platform"])
 
 # Tab 1: Primary IT Partners Management
 with tab1:
-    st.subheader("🔧 Primary IT Partners by Business Area")
+    st.subheader("Primary IT Partners by Business Area")
     st.write("Manage the primary IT partner assignments for each business area.")
     
     # Display current assignments
@@ -95,7 +95,7 @@ with tab1:
 
 # Tab 2: Add New Account
 with tab2:
-    st.subheader("➕ Add New Account")
+    st.subheader("Add New Account")
     st.write("Create a new account in the CRM system.")
     
     with st.form("add_account_form"):
@@ -142,7 +142,7 @@ with tab2:
 
 # Tab 3: Add Use Case
 with tab3:
-    st.subheader("💡 Add New Use Case")
+    st.subheader("Add New Use Case")
     st.write("Create a new use case and assign it to an account.")
     
     if not st.session_state.accounts:
@@ -179,7 +179,7 @@ with tab3:
 
 # Tab 4: Add Platform to Account
 with tab4:
-    st.subheader("🚀 Add Platform to Account")
+    st.subheader("Add Platform to Account")
     st.write("Add a new platform to an existing account.")
     
     if not st.session_state.accounts:
@@ -223,7 +223,7 @@ with tab4:
 
 # System Statistics
 st.markdown("---")
-st.subheader("📊 System Overview")
+st.subheader("System Overview")
 
 col1, col2, col3, col4 = st.columns(4)
 
@@ -243,7 +243,7 @@ with col4:
 # Recent Activity
 if st.session_state.accounts or st.session_state.use_cases:
     st.markdown("---")
-    st.subheader("📈 Recent Activity")
+    st.subheader("Recent Activity")
     
     # Show recent accounts
     if st.session_state.accounts:
@@ -263,13 +263,13 @@ if st.session_state.accounts or st.session_state.use_cases:
             st.write(f"- {uc['problem'][:50]}... ({account_info.get('team', 'Unknown Account')}) - {uc['created_at'].strftime('%Y-%m-%d %H:%M')}")
 
 # Admin Navigation
-st.sidebar.title("⚙️ Admin Functions")
+st.sidebar.title("Admin Functions")
 st.sidebar.markdown("""
 **Available Actions:**
-- 👥 **IT Partners**: Manage primary IT partner assignments
-- 🏢 **Add Account**: Create new accounts
-- 💡 **Add Use Case**: Create new use cases
-- 🚀 **Add Platform**: Add platforms to accounts
+- **IT Partners**: Manage primary IT partner assignments
+- **Add Account**: Create new accounts
+- **Add Use Case**: Create new use cases
+- **Add Platform**: Add platforms to accounts
 
 **Quick Tips:**
 - IT partners are automatically assigned based on business area
@@ -278,7 +278,7 @@ st.sidebar.markdown("""
 """)
 
 st.sidebar.markdown("---")
-st.sidebar.subheader("🔧 System Configuration")
+st.sidebar.subheader("System Configuration")
 st.sidebar.write(f"**Available Platforms:** {', '.join(st.session_state.platforms)}")
 st.sidebar.write(f"**Onboarding Statuses:** {', '.join(st.session_state.onboarding_statuses)}")
 st.sidebar.write(f"**Enablement Tiers:** {', '.join(st.session_state.enablement_tiers)}")

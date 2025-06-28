@@ -6,15 +6,15 @@ from utils.data_manager import (
 
 # Page configuration
 st.set_page_config(
-    page_title="Use Cases - CRM System",
-    page_icon="💡",
+    page_title="Use Cases - EDIP CRM",
+    page_icon="📊",
     layout="wide"
 )
 
 # Initialize data
 initialize_data()
 
-st.title("💡 Use Cases Management")
+st.title("Use Cases Management")
 
 # Show persistent success message if exists
 if 'use_case_success_message' in st.session_state:
@@ -36,7 +36,7 @@ if 'edit_use_case_id' in st.session_state and st.session_state.edit_use_case_id 
     st.info(f"Editing use case: {use_case_to_edit['problem'][:50]}...")
 
 # Add/Edit Use Case Form
-st.subheader("➕ Add New Use Case" if not edit_mode else "✏️ Edit Use Case")
+st.subheader("Add New Use Case" if not edit_mode else "Edit Use Case")
 
 with st.form("use_case_form"):
     col1, col2 = st.columns(2)
@@ -142,7 +142,7 @@ with st.form("use_case_form"):
 st.markdown("---")
 
 # Display all use cases
-st.subheader("📋 All Use Cases")
+st.subheader("All Use Cases")
 
 if st.session_state.use_cases:
     # Create a comprehensive view of all use cases
@@ -189,7 +189,7 @@ if st.session_state.use_cases:
     # Display filtered use cases
     if filtered_data:
         for i, uc_data in enumerate(filtered_data):
-            with st.expander(f"🎯 {uc_data['Account']} - {uc_data['Problem'][:40]}..."):
+            with st.expander(f"{uc_data['Account']} - {uc_data['Problem'][:40]}..."):
                 col1, col2 = st.columns(2)
                 
                 with col1:
@@ -221,7 +221,7 @@ else:
 
 # Statistics
 st.markdown("---")
-st.subheader("📊 Use Case Statistics")
+st.subheader("Use Case Statistics")
 
 if st.session_state.use_cases:
     col1, col2, col3, col4 = st.columns(4)
@@ -242,7 +242,7 @@ if st.session_state.use_cases:
         st.metric("Tier 1 Use Cases", tier1_count)
 
 # Navigation
-st.sidebar.title("🧭 Navigation")
+st.sidebar.title("Navigation")
 st.sidebar.markdown("""
 - **Add/Edit**: Use the form above to add new or edit existing use cases
 - **Filter**: Use the filter options to find specific use cases
@@ -251,7 +251,7 @@ st.sidebar.markdown("""
 
 if st.session_state.use_cases:
     st.sidebar.markdown("---")
-    st.sidebar.subheader("📈 Quick Stats")
+    st.sidebar.subheader("Quick Stats")
     
     # Status distribution
     status_counts = {}
