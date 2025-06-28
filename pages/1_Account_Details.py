@@ -34,7 +34,7 @@ account = st.session_state.accounts[st.session_state.selected_account]
 
 # Back button
 if st.button("← Back to All Accounts"):
-    st.switch_page("app.py")
+    st.switch_page("0_All_Accounts.py")
 
 st.markdown("---")
 

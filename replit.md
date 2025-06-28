@@ -21,7 +21,7 @@ This is a Streamlit-based Customer Relationship Management (CRM) system designed
 
 ### Application Structure
 ```
-├── app.py                    # Main application entry point
+├── 0_All_Accounts.py         # Main application entry point (All Accounts view)
 ├── pages/
 │   ├── 1_Account_Details.py  # Account detail view
 │   ├── 2_Use_Cases.py       # Use case management
@@ -105,7 +105,7 @@ This is a Streamlit-based Customer Relationship Management (CRM) system designed
 - **Address**: Bound to 0.0.0.0 for external access
 
 ### Workflow Configuration
-- **Run Command**: `streamlit run app.py --server.port 5000`
+- **Run Command**: `streamlit run 0_All_Accounts.py --server.port 5000`
 - **Mode**: Parallel execution with port waiting
 - **Button**: Project-level run button configuration
 
@@ -120,6 +120,7 @@ This is a Streamlit-based Customer Relationship Management (CRM) system designed
 - June 27, 2025. Initial setup
 - June 27, 2025. Fixed duplicate account display issue and added comprehensive confirmation messages for all user actions
 - June 27, 2025. Implemented enterprise design changes: Updated branding from "CRM System" to "EDIP CRM", removed all emojis for professional appearance, added custom color theme (light background with red primary), and improved navigation consistency
+- June 28, 2025. Renamed main application file from "app.py" to "0_All_Accounts.py" for clearer sidebar navigation display
 
 ## User Preferences
 

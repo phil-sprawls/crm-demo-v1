@@ -4,7 +4,7 @@ from utils.data_manager import initialize_data, search_accounts, add_account
 
 # Page configuration
 st.set_page_config(
-    page_title="EDIP CRM",
+    page_title="All Accounts - EDIP CRM",
     page_icon="📊",
     layout="wide"
 )
@@ -21,51 +21,39 @@ search_term = st.text_input("Search accounts by team, business area, VP, admin, 
 accounts = search_accounts(search_term)
 
 if accounts:
-    # Display accounts table
+    # Display accounts in a table with selection
     st.subheader(f"Accounts ({len(accounts)} found)")
     
-    # Table header
-    col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 2, 2, 1])
-    with col1:
-        st.markdown("**Team**")
-    with col2:
-        st.markdown("**Business Area**")
-    with col3:
-        st.markdown("**VP**")
-    with col4:
-        st.markdown("**Admin**")
-    with col5:
-        st.markdown("**Primary IT Partner**")
-    with col6:
-        st.markdown("**Action**")
-    st.markdown("---")
-    
-    # Display accounts data
-    for account in accounts:
-        col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 2, 2, 1])
+    # Create clickable rows using expander or button approach
+    for idx, account in enumerate(accounts):
+        col1, col2, col3, col4, col5, col6, col7 = st.columns([1.5, 2, 2, 2, 2, 2, 1])
         
         with col1:
-            st.write(account['team'])
+            st.write(f"**{account['bsnid']}**")
         with col2:
-            st.write(account['business_area'])
+            st.write(account['team'])
         with col3:
-            st.write(account['vp'])
+            st.write(account['business_area'])
         with col4:
-            st.write(account['admin'])
+            st.write(account['vp'])
         with col5:
-            st.write(account['primary_it_partner'])
+            st.write(account['admin'])
         with col6:
-            if st.button("View", key=f"view_{account['bsnid']}", help="View account details"):
+            st.write(account['primary_it_partner'])
+        with col7:
+            if st.button("View", key=f"view_{account['bsnid']}"):
                 st.session_state.selected_account = account['bsnid']
                 st.switch_page("pages/1_Account_Details.py")
+        
+        st.divider()
 
 else:
     if search_term:
-        st.info(f"No accounts found matching '{search_term}'")
+        st.info("No accounts found matching your search criteria.")
     else:
-        st.info("No accounts available. Use the Admin screen to add new accounts.")
+        st.info("No accounts available. Use the Admin panel to add new accounts.")
 
-# Quick actions
+# Quick action buttons
 st.markdown("---")
 st.subheader("Quick Actions")
 
@@ -98,3 +86,16 @@ st.sidebar.subheader("System Stats")
 st.sidebar.metric("Total Accounts", len(st.session_state.accounts))
 st.sidebar.metric("Total Use Cases", len(st.session_state.use_cases))
 st.sidebar.metric("Business Areas", len(st.session_state.business_areas))
+
+# Quick stats
+if st.session_state.accounts:
+    platform_counts = {}
+    for account in st.session_state.accounts.values():
+        for platform in account['platforms_status'].keys():
+            platform_counts[platform] = platform_counts.get(platform, 0) + 1
+    
+    if platform_counts:
+        st.sidebar.markdown("---")
+        st.sidebar.subheader("Platform Distribution")
+        for platform, count in platform_counts.items():
+            st.sidebar.write(f"**{platform}**: {count} accounts")
