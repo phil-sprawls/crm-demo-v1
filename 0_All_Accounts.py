@@ -72,7 +72,7 @@ else:
 st.markdown("---")
 st.subheader("Quick Actions")
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     if st.button("Add New Account", use_container_width=True):
@@ -83,6 +83,10 @@ with col2:
         st.switch_page("pages/2_Use_Cases.py")
 
 with col3:
+    if st.button("Manage Updates", use_container_width=True):
+        st.switch_page("pages/4_Updates.py")
+
+with col4:
     if st.button("Admin Panel", use_container_width=True):
         st.switch_page("pages/3_Admin.py")
 
@@ -92,6 +96,7 @@ st.sidebar.markdown("""
 - **All Accounts**: View and search all accounts
 - **Account Details**: View detailed information for a specific account
 - **Use Cases**: Manage use cases across all accounts
+- **Updates**: Dedicated updates management with Author, Date, Platform, Description
 - **Admin**: Administrative functions and data management
 """)
 
