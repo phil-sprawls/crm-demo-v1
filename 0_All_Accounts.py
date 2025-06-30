@@ -24,23 +24,38 @@ if accounts:
     # Display accounts in a table with selection
     st.subheader(f"Accounts ({len(accounts)} found)")
     
-    # Create clickable rows using expander or button approach
+    # Column headers
+    col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 2, 2, 1])
+    with col1:
+        st.write("**Team**")
+    with col2:
+        st.write("**Business Area**")
+    with col3:
+        st.write("**VP**")
+    with col4:
+        st.write("**Admin**")
+    with col5:
+        st.write("**Primary IT Partner**")
+    with col6:
+        st.write("**Action**")
+    
+    st.divider()
+    
+    # Create clickable rows
     for idx, account in enumerate(accounts):
-        col1, col2, col3, col4, col5, col6, col7 = st.columns([1.5, 2, 2, 2, 2, 2, 1])
+        col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 2, 2, 1])
         
         with col1:
-            st.write(f"**{account['bsnid']}**")
-        with col2:
             st.write(account['team'])
-        with col3:
+        with col2:
             st.write(account['business_area'])
-        with col4:
+        with col3:
             st.write(account['vp'])
-        with col5:
+        with col4:
             st.write(account['admin'])
-        with col6:
+        with col5:
             st.write(account['primary_it_partner'])
-        with col7:
+        with col6:
             if st.button("View", key=f"view_{account['bsnid']}"):
                 st.session_state.selected_account = account['bsnid']
                 st.switch_page("pages/1_Account_Details.py")
