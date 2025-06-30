@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 from utils.data_manager import (
-    initialize_data, add_use_case, update_use_case, get_account_use_cases
+    initialize_data, add_use_case, update_use_case, get_account_use_cases,
+    add_update, get_account_updates, update_update
 )
 
 # Page configuration
@@ -23,7 +24,7 @@ if 'use_case_success_message' in st.session_state:
 
 # Back button
 if st.button("← Back to All Accounts"):
-    st.switch_page("app.py")
+    st.switch_page("0_All_Accounts.py")
 
 st.markdown("---")
 
@@ -106,6 +107,16 @@ with st.form("use_case_form"):
                                      st.session_state.enablement_tiers,
                                      index=tier_index,
                                      help="Select the appropriate enablement tier")
+        
+        # Platform
+        platform_index = 0
+        if edit_mode and use_case_to_edit and 'platform' in use_case_to_edit and use_case_to_edit['platform'] in st.session_state.platforms:
+            platform_index = st.session_state.platforms.index(use_case_to_edit['platform'])
+        
+        platform = st.selectbox("Platform", 
+                               st.session_state.platforms,
+                               index=platform_index,
+                               help="Select the primary platform for this use case")
     
     # Form submission
     col1, col2, col3 = st.columns([1, 1, 2])
@@ -125,12 +136,12 @@ with st.form("use_case_form"):
     if submitted:
         if problem and solution and leader:
             if edit_mode:
-                update_use_case(st.session_state.edit_use_case_id, problem, solution, leader, status, enablement_tier)
+                update_use_case(st.session_state.edit_use_case_id, problem, solution, leader, status, enablement_tier, platform)
                 st.session_state.use_case_success_message = "✅ Use case has been successfully updated with your changes!"
                 if 'edit_use_case_id' in st.session_state:
                     del st.session_state.edit_use_case_id
             else:
-                use_case_id = add_use_case(selected_account, problem, solution, leader, status, enablement_tier)
+                use_case_id = add_use_case(selected_account, problem, solution, leader, status, enablement_tier, platform)
                 account_name = st.session_state.accounts[selected_account]['team']
                 st.session_state.use_case_success_message = f"✅ New use case has been successfully created and added to {account_name}!"
                 if 'selected_account_for_use_case' in st.session_state:
@@ -157,6 +168,7 @@ if st.session_state.use_cases:
             'Leader': uc['leader'],
             'Status': uc['status'],
             'Enablement Tier': uc['enablement_tier'],
+            'Platform': uc.get('platform', 'Not specified'),
             'ID': uc_id
         })
     
@@ -240,6 +252,132 @@ if st.session_state.use_cases:
     with col4:
         tier1_count = len([uc for uc in st.session_state.use_cases.values() if uc['enablement_tier'] == 'Tier 1'])
         st.metric("Tier 1 Use Cases", tier1_count)
+
+# Updates Section
+st.markdown("---")
+st.header("Updates Management")
+
+# Create tabs for Updates functionality
+update_tab1, update_tab2 = st.tabs(["Add Update", "View All Updates"])
+
+with update_tab1:
+    st.subheader("Add New Update")
+    
+    with st.form("add_update_form"):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Account selection for update
+            if st.session_state.accounts:
+                account_options = [(bsnid, f"{account['team']} ({account['business_area']})") 
+                                 for bsnid, account in st.session_state.accounts.items()]
+                account_labels = [label for _, label in account_options]
+                account_values = [bsnid for bsnid, _ in account_options]
+                
+                selected_account_idx = st.selectbox("Select Account", 
+                                                   range(len(account_labels)),
+                                                   format_func=lambda x: account_labels[x],
+                                                   help="Choose the account for this update")
+                selected_update_account = account_values[selected_account_idx]
+            else:
+                st.error("No accounts available. Please add accounts first.")
+                st.stop()
+            
+            # Author
+            author = st.text_input("Author", 
+                                 help="Person creating this update")
+            
+        with col2:
+            # Platform selection
+            platform = st.selectbox("Platform", 
+                                   st.session_state.platforms,
+                                   help="Select the platform this update relates to")
+            
+            # Description
+            description = st.text_area("Description", 
+                                     height=100,
+                                     help="Describe the update or progress made")
+        
+        # Submit button
+        col1, col2, col3 = st.columns([1, 1, 2])
+        with col1:
+            submitted_update = st.form_submit_button("Add Update", use_container_width=True)
+        
+        if submitted_update:
+            if author and description:
+                add_update(selected_update_account, author, platform, description)
+                account_name = st.session_state.accounts[selected_update_account]['team']
+                st.success(f"✅ Update has been successfully added to {account_name}!")
+                st.rerun()
+            else:
+                st.error("Please fill in all required fields (Author and Description)")
+
+with update_tab2:
+    st.subheader("All Updates")
+    
+    if st.session_state.updates:
+        # Create a comprehensive view of all updates
+        updates_data = []
+        for update_id, update in st.session_state.updates.items():
+            account_info = st.session_state.accounts.get(update['account_bsnid'], {})
+            updates_data.append({
+                'Account': account_info.get('team', 'Unknown'),
+                'Business Area': account_info.get('business_area', 'Unknown'),
+                'Author': update['author'],
+                'Date': update['date'].strftime('%Y-%m-%d %H:%M'),
+                'Platform': update['platform'],
+                'Description': update['description'][:80] + "..." if len(update['description']) > 80 else update['description'],
+                'Full Description': update['description'],
+                'ID': update_id
+            })
+        
+        # Filter options for updates
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            update_business_areas = ['All'] + list(set([upd['Business Area'] for upd in updates_data]))
+            selected_update_ba = st.selectbox("Filter by Business Area", update_business_areas, key="update_ba_filter")
+        
+        with col2:
+            update_platforms = ['All'] + list(set([upd['Platform'] for upd in updates_data]))
+            selected_update_platform = st.selectbox("Filter by Platform", update_platforms, key="update_platform_filter")
+        
+        with col3:
+            update_authors = ['All'] + list(set([upd['Author'] for upd in updates_data]))
+            selected_update_author = st.selectbox("Filter by Author", update_authors, key="update_author_filter")
+        
+        # Apply filters
+        filtered_updates = updates_data
+        if selected_update_ba != 'All':
+            filtered_updates = [upd for upd in filtered_updates if upd['Business Area'] == selected_update_ba]
+        if selected_update_platform != 'All':
+            filtered_updates = [upd for upd in filtered_updates if upd['Platform'] == selected_update_platform]
+        if selected_update_author != 'All':
+            filtered_updates = [upd for upd in filtered_updates if upd['Author'] == selected_update_author]
+        
+        st.write(f"**Showing {len(filtered_updates)} of {len(updates_data)} updates**")
+        
+        # Display updates
+        for update in filtered_updates:
+            with st.expander(f"{update['Account']} - {update['Platform']} - {update['Date']}"):
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    st.write(f"**Account:** {update['Account']}")
+                    st.write(f"**Business Area:** {update['Business Area']}")
+                
+                with col2:
+                    st.write(f"**Author:** {update['Author']}")
+                    st.write(f"**Platform:** {update['Platform']}")
+                
+                with col3:
+                    st.write(f"**Date:** {update['Date']}")
+                
+                st.markdown("**Description:**")
+                st.write(update['Full Description'])
+    
+    else:
+        st.info("No updates available. Add your first update using the form above.")
 
 # Navigation
 st.sidebar.title("Navigation")

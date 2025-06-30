@@ -166,10 +166,11 @@ with tab3:
                 leader = st.text_input("Leader*")
                 status = st.selectbox("Status*", ["Active", "Completed", "On Hold", "Cancelled", "Planning"])
                 enablement_tier = st.selectbox("Enablement Tier*", st.session_state.enablement_tiers)
+                platform = st.selectbox("Platform*", st.session_state.platforms)
             
             if st.form_submit_button("Create Use Case", use_container_width=True):
                 if problem and solution and leader:
-                    use_case_id = add_use_case(selected_account, problem, solution, leader, status, enablement_tier)
+                    use_case_id = add_use_case(selected_account, problem, solution, leader, status, enablement_tier, platform)
                     account_name = st.session_state.accounts[selected_account]['team']
                     st.session_state.admin_success_message = f"✅ New use case has been successfully created and added to {account_name}!"
                     st.balloons()
@@ -225,7 +226,7 @@ with tab4:
 st.markdown("---")
 st.subheader("System Overview")
 
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4, col5 = st.columns(5)
 
 with col1:
     st.metric("Total Accounts", len(st.session_state.accounts))
@@ -234,9 +235,12 @@ with col2:
     st.metric("Total Use Cases", len(st.session_state.use_cases))
 
 with col3:
-    st.metric("Business Areas", len(st.session_state.business_areas))
+    st.metric("Total Updates", len(st.session_state.updates))
 
 with col4:
+    st.metric("Business Areas", len(st.session_state.business_areas))
+
+with col5:
     total_platforms = sum(len(acc['platforms_status']) for acc in st.session_state.accounts.values())
     st.metric("Platform Instances", total_platforms)
 

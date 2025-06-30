@@ -121,6 +121,7 @@ This is a Streamlit-based Customer Relationship Management (CRM) system designed
 - June 27, 2025. Fixed duplicate account display issue and added comprehensive confirmation messages for all user actions
 - June 27, 2025. Implemented enterprise design changes: Updated branding from "CRM System" to "EDIP CRM", removed all emojis for professional appearance, added custom color theme (light background with red primary), and improved navigation consistency
 - June 28, 2025. Renamed main application file from "app.py" to "0_All_Accounts.py" for clearer sidebar navigation display
+- June 28, 2025. Added platform parameter to Use Cases and implemented Updates functionality with Author, Date, Platform, and Description fields
 
 ## User Preferences
 

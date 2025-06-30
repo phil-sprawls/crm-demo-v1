@@ -11,6 +11,9 @@ def initialize_data():
     if 'use_cases' not in st.session_state:
         st.session_state.use_cases = {}
     
+    if 'updates' not in st.session_state:
+        st.session_state.updates = {}
+    
     if 'business_areas' not in st.session_state:
         st.session_state.business_areas = {
             'Finance': 'John Smith',
@@ -80,21 +83,24 @@ def _add_sample_data():
                         "Implement automated reporting dashboard using Databricks",
                         "Mark Thompson",
                         "Active",
-                        "Tier 1")
+                        "Tier 1",
+                        "Databricks")
         elif account_data['team'] == 'Sales Analytics':
             add_use_case(bsnid,
                         "Sales forecasting accuracy is below 70%",
                         "Build ML-powered forecasting model with real-time data",
                         "Sarah Chen", 
                         "Planning",
-                        "Tier 2")
+                        "Tier 2",
+                        "Snowflake")
         elif account_data['team'] == 'Operations Intelligence':
             add_use_case(bsnid,
                         "Supply chain visibility is limited",
                         "Create real-time tracking dashboard for inventory and logistics",
                         "Lisa Wang",
                         "Completed", 
-                        "Tier 1")
+                        "Tier 1",
+                        "Power Platform")
 
 def add_account(team, business_area, vp, admin, primary_it_partner, platforms_status=None):
     """Add a new account to the system"""
@@ -113,11 +119,12 @@ def add_account(team, business_area, vp, admin, primary_it_partner, platforms_st
         'artifacts_folder_links': [],
         'platforms_status': platforms_status,
         'use_cases': [],
+        'updates': [],
         'created_at': datetime.now()
     }
     return bsnid
 
-def add_use_case(account_bsnid, problem, solution, leader, status, enablement_tier):
+def add_use_case(account_bsnid, problem, solution, leader, status, enablement_tier, platform):
     """Add a new use case to an account"""
     use_case_id = str(uuid.uuid4())
     use_case = {
@@ -128,6 +135,7 @@ def add_use_case(account_bsnid, problem, solution, leader, status, enablement_ti
         'leader': leader,
         'status': status,
         'enablement_tier': enablement_tier,
+        'platform': platform,
         'created_at': datetime.now()
     }
     
@@ -139,7 +147,7 @@ def add_use_case(account_bsnid, problem, solution, leader, status, enablement_ti
     
     return use_case_id
 
-def update_use_case(use_case_id, problem, solution, leader, status, enablement_tier):
+def update_use_case(use_case_id, problem, solution, leader, status, enablement_tier, platform):
     """Update an existing use case"""
     if use_case_id in st.session_state.use_cases:
         st.session_state.use_cases[use_case_id].update({
@@ -147,7 +155,8 @@ def update_use_case(use_case_id, problem, solution, leader, status, enablement_t
             'solution': solution,
             'leader': leader,
             'status': status,
-            'enablement_tier': enablement_tier
+            'enablement_tier': enablement_tier,
+            'platform': platform
         })
 
 def get_account_use_cases(account_bsnid):
@@ -199,3 +208,47 @@ def add_artifacts_folder_link(account_bsnid, link):
     """Add an artifacts folder link to an account"""
     if account_bsnid in st.session_state.accounts:
         st.session_state.accounts[account_bsnid]['artifacts_folder_links'].append(link)
+
+def add_update(account_bsnid, author, platform, description):
+    """Add a new update to an account"""
+    update_id = str(uuid.uuid4())
+    update = {
+        'id': update_id,
+        'account_bsnid': account_bsnid,
+        'author': author,
+        'date': datetime.now(),
+        'platform': platform,
+        'description': description,
+        'created_at': datetime.now()
+    }
+    
+    st.session_state.updates[update_id] = update
+    
+    # Add update to account
+    if account_bsnid in st.session_state.accounts:
+        if 'updates' not in st.session_state.accounts[account_bsnid]:
+            st.session_state.accounts[account_bsnid]['updates'] = []
+        st.session_state.accounts[account_bsnid]['updates'].append(update_id)
+    
+    return update_id
+
+def get_account_updates(account_bsnid):
+    """Get all updates for a specific account"""
+    if account_bsnid not in st.session_state.accounts:
+        return []
+    
+    if 'updates' not in st.session_state.accounts[account_bsnid]:
+        return []
+        
+    update_ids = st.session_state.accounts[account_bsnid]['updates']
+    return [st.session_state.updates[update_id] for update_id in update_ids if update_id in st.session_state.updates]
+
+def update_update(update_id, author, platform, description):
+    """Update an existing update"""
+    if update_id in st.session_state.updates:
+        st.session_state.updates[update_id].update({
+            'author': author,
+            'platform': platform,
+            'description': description,
+            'date': datetime.now()  # Update the date when modified
+        })
