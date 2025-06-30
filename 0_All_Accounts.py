@@ -15,40 +15,50 @@ initialize_data()
 # Custom CSS for center alignment in table
 st.markdown("""
 <style>
-/* Center align table columns both horizontally and vertically */
-.main .block-container [data-testid="column"] {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 50px;
+/* Target Streamlit columns more specifically */
+div[data-testid="column"] {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 60px !important;
 }
 
-/* Center align text in table columns */
-.main .block-container [data-testid="column"] p {
-    text-align: center;
-    margin: auto;
+/* Center align all paragraph text */
+div[data-testid="column"] p {
+    text-align: center !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
 }
 
-/* Center align buttons in table */
-.main .block-container [data-testid="column"] button {
-    display: block;
-    margin: auto;
+/* Center align buttons */
+div[data-testid="column"] button {
+    margin: 0 auto !important;
+    display: block !important;
 }
 
-/* Center align bold headers */
-.main .block-container [data-testid="column"] strong {
-    display: block;
-    text-align: center;
-    margin: auto;
+/* Center align bold text */
+div[data-testid="column"] strong {
+    text-align: center !important;
+    display: block !important;
 }
 
-/* Ensure divs within columns are centered */
-.main .block-container [data-testid="column"] > div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
+/* Force vertical centering on all elements */
+div[data-testid="column"] > div {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+    min-height: 50px !important;
+}
+
+/* Additional targeting for nested elements */
+div[data-testid="column"] .element-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 </style>
 """, unsafe_allow_html=True)
