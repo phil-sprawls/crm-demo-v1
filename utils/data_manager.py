@@ -209,14 +209,14 @@ def add_artifacts_folder_link(account_bsnid, link):
     if account_bsnid in st.session_state.accounts:
         st.session_state.accounts[account_bsnid]['artifacts_folder_links'].append(link)
 
-def add_update(account_bsnid, author, platform, description):
+def add_update(account_bsnid, author, date, platform, description):
     """Add a new update to an account"""
     update_id = str(uuid.uuid4())
     update = {
         'id': update_id,
         'account_bsnid': account_bsnid,
         'author': author,
-        'date': datetime.now(),
+        'date': date,
         'platform': platform,
         'description': description,
         'created_at': datetime.now()
@@ -243,12 +243,12 @@ def get_account_updates(account_bsnid):
     update_ids = st.session_state.accounts[account_bsnid]['updates']
     return [st.session_state.updates[update_id] for update_id in update_ids if update_id in st.session_state.updates]
 
-def update_update(update_id, author, platform, description):
+def update_update(update_id, author, date, platform, description):
     """Update an existing update"""
     if update_id in st.session_state.updates:
         st.session_state.updates[update_id].update({
             'author': author,
+            'date': date,
             'platform': platform,
-            'description': description,
-            'date': datetime.now()  # Update the date when modified
+            'description': description
         })

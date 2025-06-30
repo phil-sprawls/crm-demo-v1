@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from utils.data_manager import (
-    initialize_data, get_account_use_cases, add_azure_devops_link, 
+    initialize_data, get_account_use_cases, get_account_updates, add_azure_devops_link, 
     add_artifacts_folder_link, add_platform_to_account, update_platform_status
 )
 
@@ -157,6 +157,7 @@ if use_cases:
             'Leader': uc['leader'],
             'Status': uc['status'],
             'Enablement Tier': uc['enablement_tier'],
+            'Platform': uc.get('platform', 'Not specified'),
             'ID': uc['id']
         })
     
@@ -175,6 +176,7 @@ if use_cases:
                 st.write(f"**Leader:** {uc['leader']}")
                 st.write(f"**Status:** {uc['status']}")
                 st.write(f"**Enablement Tier:** {uc['enablement_tier']}")
+                st.write(f"**Platform:** {uc.get('platform', 'Not specified')}")
             
             if st.button(f"Edit Use Case", key=f"edit_uc_{uc['id']}"):
                 st.session_state.edit_use_case_id = uc['id']
@@ -182,6 +184,33 @@ if use_cases:
 
 else:
     st.info("No use cases found for this account")
+
+st.markdown("---")
+
+# Updates
+st.subheader("Recent Updates")
+
+updates = get_account_updates(account['bsnid'])
+
+if updates:
+    # Display the most recent updates
+    recent_updates = sorted(updates, key=lambda x: x['date'], reverse=True)[:5]
+    
+    for update in recent_updates:
+        with st.expander(f"{update['date'].strftime('%Y-%m-%d')} - {update['platform']}"):
+            col1, col2 = st.columns([2, 1])
+            with col1:
+                st.write(f"**Description:** {update['description']}")
+            with col2:
+                st.write(f"**Author:** {update['author']}")
+                st.write(f"**Platform:** {update['platform']}")
+                st.write(f"**Date:** {update['date'].strftime('%Y-%m-%d')}")
+    
+    if len(updates) > 5:
+        st.info(f"Showing 5 most recent updates. Total updates: {len(updates)}")
+        
+else:
+    st.info("No updates found for this account")
 
 # Quick actions
 st.markdown("---")
@@ -195,6 +224,10 @@ with col1:
 with col2:
     if st.button("View All Use Cases", use_container_width=True):
         st.switch_page("pages/2_Use_Cases.py")
+        
+with col3:
+    if st.button("View All Updates", use_container_width=True):
+        st.switch_page("pages/4_Updates.py")
 
 with col3:
     if st.button("Admin Panel", use_container_width=True):

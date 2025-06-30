@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from datetime import datetime
 from utils.data_manager import (
     initialize_data, add_use_case, update_use_case, get_account_use_cases,
     add_update, get_account_updates, update_update
@@ -287,6 +288,10 @@ with update_tab1:
             author = st.text_input("Author", 
                                  help="Person creating this update")
             
+            # Date
+            update_date = st.date_input("Date", 
+                                      help="Date of this update")
+            
         with col2:
             # Platform selection
             platform = st.selectbox("Platform", 
@@ -304,13 +309,15 @@ with update_tab1:
             submitted_update = st.form_submit_button("Add Update", use_container_width=True)
         
         if submitted_update:
-            if author and description:
-                add_update(selected_update_account, author, platform, description)
+            if author and description and update_date:
+                # Convert date to datetime for consistency
+                update_datetime = datetime.combine(update_date, datetime.min.time())
+                add_update(selected_update_account, author, update_datetime, platform, description)
                 account_name = st.session_state.accounts[selected_update_account]['team']
                 st.success(f"✅ Update has been successfully added to {account_name}!")
                 st.rerun()
             else:
-                st.error("Please fill in all required fields (Author and Description)")
+                st.error("Please fill in all required fields (Author, Date, and Description)")
 
 with update_tab2:
     st.subheader("All Updates")
