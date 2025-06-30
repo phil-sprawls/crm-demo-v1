@@ -35,6 +35,9 @@ def initialize_data():
     if not st.session_state.accounts and 'sample_data_loaded' not in st.session_state:
         _add_sample_data()
         st.session_state.sample_data_loaded = True
+        # Add sample updates after all data is loaded
+        if hasattr(st.session_state, 'accounts') and st.session_state.accounts:
+            _add_sample_updates()
 
 def _add_sample_data():
     """Add sample data for demonstration purposes"""
@@ -101,6 +104,9 @@ def _add_sample_data():
                         "Completed", 
                         "Tier 1",
                         "Power Platform")
+    
+    # Add sample updates for demonstration
+    # _add_sample_updates()  # Will be called after initialization
 
 def add_account(team, business_area, vp, admin, primary_it_partner, platforms_status=None):
     """Add a new account to the system"""
@@ -252,3 +258,75 @@ def update_update(update_id, author, date, platform, description):
             'platform': platform,
             'description': description
         })
+
+def _add_sample_updates():
+    """Add sample updates for demonstration purposes"""
+    from datetime import datetime, timedelta
+    
+    # Get account BSNIDs to add updates
+    account_bsnids = list(st.session_state.accounts.keys())
+    
+    if len(account_bsnids) >= 3:
+        # Find specific accounts to add updates to
+        analytics_bsnid = None
+        sales_bsnid = None
+        operations_bsnid = None
+        
+        for bsnid, account in st.session_state.accounts.items():
+            if account['team'] == 'Analytics Team':
+                analytics_bsnid = bsnid
+            elif account['team'] == 'Sales Analytics':
+                sales_bsnid = bsnid
+            elif account['team'] == 'Operations Intelligence':
+                operations_bsnid = bsnid
+        
+        # Analytics Team Updates
+        if analytics_bsnid:
+            add_update(analytics_bsnid, "Mark Thompson", 
+                      datetime.now() - timedelta(days=2),
+                      "Databricks", 
+                      "Completed initial data pipeline setup. Dashboard framework is ready for testing.")
+            
+            add_update(analytics_bsnid, "Jennifer Lee", 
+                      datetime.now() - timedelta(days=5),
+                      "Databricks", 
+                      "Data source connections established. Beginning ETL process development.")
+            
+            add_update(analytics_bsnid, "Mark Thompson", 
+                      datetime.now() - timedelta(days=10),
+                      "Databricks", 
+                      "Project kickoff meeting completed. Requirements gathered and documented.")
+        
+        # Sales Analytics Updates
+        if sales_bsnid:
+            add_update(sales_bsnid, "Sarah Chen", 
+                      datetime.now() - timedelta(days=1),
+                      "Snowflake", 
+                      "ML model training in progress. Initial accuracy showing 85% improvement.")
+            
+            add_update(sales_bsnid, "Robert Kim", 
+                      datetime.now() - timedelta(days=7),
+                      "Power Platform", 
+                      "Data quality assessment completed. Ready to begin model development.")
+            
+            add_update(sales_bsnid, "Sarah Chen", 
+                      datetime.now() - timedelta(days=14),
+                      "Snowflake", 
+                      "Historical sales data migration to Snowflake completed successfully.")
+        
+        # Operations Intelligence Updates
+        if operations_bsnid:
+            add_update(operations_bsnid, "Lisa Wang", 
+                      datetime.now() - timedelta(days=3),
+                      "Power Platform", 
+                      "Supply chain dashboard deployed to production. User training scheduled for next week.")
+            
+            add_update(operations_bsnid, "David Rodriguez", 
+                      datetime.now() - timedelta(days=8),
+                      "Power Platform", 
+                      "Dashboard testing phase completed. All KPIs displaying correctly.")
+            
+            add_update(operations_bsnid, "Lisa Wang", 
+                      datetime.now() - timedelta(days=12),
+                      "Power Platform", 
+                      "Real-time data connectors configured. Beginning dashboard development.")
