@@ -23,75 +23,45 @@ search_term = st.text_input("Search accounts by team, business area, VP, admin, 
 accounts = search_accounts(search_term)
 
 if accounts:
-    # Display accounts in an HTML table with proper vertical centering
+    # Display accounts using a styled dataframe for better vertical centering
     st.subheader(f"Accounts ({len(accounts)} found)")
     
-    # Create HTML table with proper styling
-    table_html = """
+    # Add CSS for dataframe styling
+    st.markdown("""
     <style>
-    .accounts-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        font-family: 'Source Sans Pro', sans-serif;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    /* Style the dataframe for better vertical centering */
+    .dataframe td, .dataframe th {
+        text-align: center !important;
+        vertical-align: middle !important;
+        padding: 12px !important;
     }
-    .accounts-table th {
-        background-color: #f0f2f6;
-        padding: 15px 12px;
-        text-align: center;
-        vertical-align: middle;
-        font-weight: bold;
-        border-bottom: 2px solid #e6e6e6;
-        font-size: 14px;
+    .dataframe th {
+        background-color: #f0f2f6 !important;
+        font-weight: bold !important;
     }
-    .accounts-table td {
-        padding: 15px 12px;
-        text-align: center;
-        vertical-align: middle;
-        border-bottom: 1px solid #e6e6e6;
-        font-size: 14px;
-    }
-    .accounts-table tr:hover {
-        background-color: #f8f9fa;
-    }
-    .accounts-table tr:nth-child(even) {
-        background-color: #fafafa;
+    .dataframe {
+        font-size: 14px !important;
     }
     </style>
+    """, unsafe_allow_html=True)
     
-    <table class="accounts-table">
-        <thead>
-            <tr>
-                <th style="width: 20%">Team</th>
-                <th style="width: 20%">Business Area</th>
-                <th style="width: 20%">VP</th>
-                <th style="width: 20%">Admin</th>
-                <th style="width: 20%">Primary IT Partner</th>
-            </tr>
-        </thead>
-        <tbody>
-    """
+    # Create dataframe for display
+    df_display = pd.DataFrame([
+        {
+            'Team': account['team'],
+            'Business Area': account['business_area'],
+            'VP': account['vp'],
+            'Admin': account['admin'],
+            'Primary IT Partner': account['primary_it_partner']
+        }
+        for account in accounts
+    ])
     
-    for idx, account in enumerate(accounts):
-        table_html += f"""
-            <tr>
-                <td>{account['team']}</td>
-                <td>{account['business_area']}</td>
-                <td>{account['vp']}</td>
-                <td>{account['admin']}</td>
-                <td>{account['primary_it_partner']}</td>
-            </tr>
-        """
+    # Display the dataframe
+    st.dataframe(df_display, use_container_width=True, hide_index=True)
     
-    table_html += """
-        </tbody>
-    </table>
-    """
-    
-    st.markdown(table_html, unsafe_allow_html=True)
-    
-    # Streamlit buttons for account selection
+    # Account selection buttons
+    st.markdown("---")
     st.markdown("**Select an account to view details:**")
     cols = st.columns(min(len(accounts), 3))
     for idx, account in enumerate(accounts):
