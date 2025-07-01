@@ -26,22 +26,19 @@ if 'account_success_message' in st.session_state:
 if 'selected_account' not in st.session_state or st.session_state.selected_account not in st.session_state.accounts:
     st.error("No account selected. Please go back to All Accounts and select an account.")
     if st.button("← Back to All Accounts"):
-        # Try multiple navigation approaches for deployment compatibility
-        try:
-            st.switch_page("0_All_Accounts.py")
-        except:
-            try:
-                st.switch_page("app.py")
-            except:
-                # Fallback - use rerun with navigation flag
-                st.session_state.navigate_to_home = True
-                st.rerun()
+        # Use JavaScript redirect as it works reliably in deployment
+        st.markdown("""
+        <script>
+        window.location.href = window.location.origin;
+        </script>
+        """, unsafe_allow_html=True)
+        st.stop()
     st.stop()
 
 # Get the selected account
 account = st.session_state.accounts[st.session_state.selected_account]
 
-# Back button - using session state for deployment compatibility
+# Back button - using JavaScript redirect for deployment compatibility
 if st.button("← Back to All Accounts"):
     # Clear any editing states
     if 'edit_use_case_id' in st.session_state:
@@ -49,16 +46,13 @@ if st.button("← Back to All Accounts"):
     if 'selected_account' in st.session_state:
         del st.session_state.selected_account
     
-    # Try multiple navigation approaches for deployment compatibility
-    try:
-        st.switch_page("0_All_Accounts.py")
-    except:
-        try:
-            st.switch_page("app.py")
-        except:
-            # Fallback - use rerun with navigation flag
-            st.session_state.navigate_to_home = True
-            st.rerun()
+    # Use JavaScript redirect as it works reliably in deployment
+    st.markdown("""
+    <script>
+    window.location.href = window.location.origin;
+    </script>
+    """, unsafe_allow_html=True)
+    st.stop()
 
 st.markdown("---")
 

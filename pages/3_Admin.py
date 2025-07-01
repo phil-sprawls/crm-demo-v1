@@ -23,18 +23,15 @@ if 'admin_success_message' in st.session_state:
     # Clear the message after showing it
     del st.session_state.admin_success_message
 
-# Back button - using deployment-compatible navigation
+# Back button - using JavaScript redirect for deployment compatibility
 if st.button("← Back to All Accounts"):
-    # Try multiple navigation approaches for deployment compatibility
-    try:
-        st.switch_page("0_All_Accounts.py")
-    except:
-        try:
-            st.switch_page("app.py")
-        except:
-            # Fallback - use rerun with navigation flag
-            st.session_state.navigate_to_home = True
-            st.rerun()
+    # Use JavaScript redirect as it works reliably in deployment
+    st.markdown("""
+    <script>
+    window.location.href = window.location.origin;
+    </script>
+    """, unsafe_allow_html=True)
+    st.stop()
 
 st.markdown("---")
 
