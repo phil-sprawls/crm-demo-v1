@@ -26,19 +26,13 @@ if 'account_success_message' in st.session_state:
 if 'selected_account' not in st.session_state or st.session_state.selected_account not in st.session_state.accounts:
     st.error("No account selected. Please go back to All Accounts and select an account.")
     if st.button("← Back to All Accounts"):
-        # Use JavaScript redirect as it works reliably in deployment
-        st.markdown("""
-        <script>
-        window.location.href = window.location.origin;
-        </script>
-        """, unsafe_allow_html=True)
-        st.stop()
+        st.switch_page("app.py")
     st.stop()
 
 # Get the selected account
 account = st.session_state.accounts[st.session_state.selected_account]
 
-# Back button - using JavaScript redirect for deployment compatibility
+# Back button
 if st.button("← Back to All Accounts"):
     # Clear any editing states
     if 'edit_use_case_id' in st.session_state:
@@ -46,13 +40,8 @@ if st.button("← Back to All Accounts"):
     if 'selected_account' in st.session_state:
         del st.session_state.selected_account
     
-    # Use JavaScript redirect as it works reliably in deployment
-    st.markdown("""
-    <script>
-    window.location.href = window.location.origin;
-    </script>
-    """, unsafe_allow_html=True)
-    st.stop()
+    # Use standard Streamlit navigation
+    st.switch_page("app.py")
 
 st.markdown("---")
 

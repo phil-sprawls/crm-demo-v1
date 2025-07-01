@@ -23,15 +23,9 @@ if 'use_case_success_message' in st.session_state:
     st.success(st.session_state.use_case_success_message)
     del st.session_state.use_case_success_message
 
-# Back button - using JavaScript redirect for deployment compatibility
+# Back button
 if st.button("← Back to All Accounts"):
-    # Use JavaScript redirect as it works reliably in deployment
-    st.markdown("""
-    <script>
-    window.location.href = window.location.origin;
-    </script>
-    """, unsafe_allow_html=True)
-    st.stop()
+    st.switch_page("app.py")
 
 st.markdown("---")
 

@@ -129,6 +129,7 @@ This is a Streamlit-based Customer Relationship Management (CRM) system designed
 - July 1, 2025. Fixed all broken navigation links throughout the application: updated Account Details and Admin pages to reference correct main file (0_All_Accounts.py instead of app.py), fixed layout issue with duplicate column usage in Account Details quick actions
 - July 1, 2025. Implemented deployment-compatible navigation system with fallback mechanisms: added try-catch navigation logic to handle differences between preview and deployed environments, created full app.py implementation with navigation fallback handling, ensured consistent functionality across both development and production deployments
 - July 1, 2025. Replaced complex navigation fallbacks with JavaScript redirect approach: implemented window.location.href redirect to root URL for all "Back to All Accounts" buttons, providing reliable navigation that works consistently in both preview and deployed environments
+- July 1, 2025. Reverted to consistent app.py navigation approach: simplified all "Back to All Accounts" buttons to use st.switch_page("app.py") since deployment configuration uses app.py as main entry point, ensuring consistent navigation behavior across preview and deployed environments
 
 ## User Preferences
 
