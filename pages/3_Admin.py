@@ -25,7 +25,7 @@ if 'admin_success_message' in st.session_state:
 
 # Back button
 if st.button("← Back to All Accounts"):
-    st.switch_page("app.py")
+    st.switch_page("0_All_Accounts.py")
 
 st.markdown("---")
 

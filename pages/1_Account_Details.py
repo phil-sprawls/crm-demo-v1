@@ -26,7 +26,7 @@ if 'account_success_message' in st.session_state:
 if 'selected_account' not in st.session_state or st.session_state.selected_account not in st.session_state.accounts:
     st.error("No account selected. Please go back to All Accounts and select an account.")
     if st.button("← Back to All Accounts"):
-        st.switch_page("app.py")
+        st.switch_page("0_All_Accounts.py")
     st.stop()
 
 # Get the selected account
@@ -214,7 +214,7 @@ else:
 
 # Quick actions
 st.markdown("---")
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     if st.button("Add Use Case", use_container_width=True):
@@ -229,7 +229,7 @@ with col3:
     if st.button("View All Updates", use_container_width=True):
         st.switch_page("pages/4_Updates.py")
 
-with col3:
+with col4:
     if st.button("Admin Panel", use_container_width=True):
         st.switch_page("pages/3_Admin.py")
 
