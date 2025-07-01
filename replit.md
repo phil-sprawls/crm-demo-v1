@@ -125,6 +125,7 @@ This is a Streamlit-based Customer Relationship Management (CRM) system designed
 - June 30, 2025. Enhanced Account Details page to display Platform field in Use Cases and added complete Updates section showing recent updates with full metadata
 - June 30, 2025. Created comprehensive sample updates for all demo accounts with realistic project progress tracking across different platforms and timeframes
 - June 30, 2025. Added CSS styling for table alignment in All Accounts page
+- July 1, 2025. Fixed deployment configuration by creating app.py compatibility file to match deployment settings while preserving 0_All_Accounts.py as main entry point
 
 ## User Preferences
 
