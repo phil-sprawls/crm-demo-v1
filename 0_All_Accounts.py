@@ -26,19 +26,34 @@ if accounts:
     # Display accounts in a custom table with buttons in the rightmost column
     st.subheader(f"Accounts ({len(accounts)} found)")
     
-    # Add CSS for column alignment
+    # Add CSS for improved table styling
     st.markdown("""
     <style>
-    /* Center align columns */
+    /* Center align columns and improve styling */
     div[data-testid="column"] {
         display: flex;
         align-items: center;
         justify-content: center;
-        min-height: 50px;
+        min-height: 35px;
     }
     div[data-testid="column"] p {
         text-align: center;
         margin: 0;
+    }
+    /* Style for header row */
+    .table-header {
+        text-align: center;
+        font-size: 1.1em;
+        font-weight: bold;
+        padding: 6px;
+        margin: 0;
+    }
+    /* Style for data rows */
+    .table-cell {
+        text-align: center;
+        padding: 4px 8px;
+        margin: 0;
+        line-height: 1.2;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -46,17 +61,17 @@ if accounts:
     # Create header row
     col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 2, 2, 1])
     with col1:
-        st.markdown("**Team**")
+        st.markdown("<div class='table-header'>Team</div>", unsafe_allow_html=True)
     with col2:
-        st.markdown("**Business Area**")
+        st.markdown("<div class='table-header'>Business Area</div>", unsafe_allow_html=True)
     with col3:
-        st.markdown("**VP**")
+        st.markdown("<div class='table-header'>VP</div>", unsafe_allow_html=True)
     with col4:
-        st.markdown("**Admin**")
+        st.markdown("<div class='table-header'>Admin</div>", unsafe_allow_html=True)
     with col5:
-        st.markdown("**Primary IT Partner**")
+        st.markdown("<div class='table-header'>Primary IT Partner</div>", unsafe_allow_html=True)
     with col6:
-        st.markdown("**Action**")
+        st.markdown("<div class='table-header'>Action</div>", unsafe_allow_html=True)
     
     st.divider()
     
@@ -65,15 +80,15 @@ if accounts:
         col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 2, 2, 1])
         
         with col1:
-            st.markdown(f"<div style='text-align: center; padding: 8px;'>{account['team']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='table-cell'>{account['team']}</div>", unsafe_allow_html=True)
         with col2:
-            st.markdown(f"<div style='text-align: center; padding: 8px;'>{account['business_area']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='table-cell'>{account['business_area']}</div>", unsafe_allow_html=True)
         with col3:
-            st.markdown(f"<div style='text-align: center; padding: 8px;'>{account['vp']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='table-cell'>{account['vp']}</div>", unsafe_allow_html=True)
         with col4:
-            st.markdown(f"<div style='text-align: center; padding: 8px;'>{account['admin']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='table-cell'>{account['admin']}</div>", unsafe_allow_html=True)
         with col5:
-            st.markdown(f"<div style='text-align: center; padding: 8px;'>{account['primary_it_partner']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='table-cell'>{account['primary_it_partner']}</div>", unsafe_allow_html=True)
         with col6:
             if st.button("View", key=f"view_{account['bsnid']}", use_container_width=True):
                 st.session_state.selected_account = account['bsnid']
