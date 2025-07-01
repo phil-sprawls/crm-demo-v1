@@ -12,56 +12,7 @@ st.set_page_config(
 # Initialize data
 initialize_data()
 
-# Custom CSS for center alignment in table
-st.markdown("""
-<style>
-/* Target Streamlit columns more specifically */
-div[data-testid="column"] {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    min-height: 60px !important;
-}
 
-/* Center align all paragraph text */
-div[data-testid="column"] p {
-    text-align: center !important;
-    margin: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    height: 100% !important;
-}
-
-/* Center align buttons */
-div[data-testid="column"] button {
-    margin: 0 auto !important;
-    display: block !important;
-}
-
-/* Center align bold text */
-div[data-testid="column"] strong {
-    text-align: center !important;
-    display: block !important;
-}
-
-/* Force vertical centering on all elements */
-div[data-testid="column"] > div {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    height: 100% !important;
-    min-height: 50px !important;
-}
-
-/* Additional targeting for nested elements */
-div[data-testid="column"] .element-container {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-</style>
-""", unsafe_allow_html=True)
 
 st.title("EDIP CRM - All Accounts")
 
@@ -72,46 +23,82 @@ search_term = st.text_input("Search accounts by team, business area, VP, admin, 
 accounts = search_accounts(search_term)
 
 if accounts:
-    # Display accounts in a table with selection
+    # Display accounts in an HTML table with proper vertical centering
     st.subheader(f"Accounts ({len(accounts)} found)")
     
-    # Column headers
-    col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 2, 2, 1])
-    with col1:
-        st.write("**Team**")
-    with col2:
-        st.write("**Business Area**")
-    with col3:
-        st.write("**VP**")
-    with col4:
-        st.write("**Admin**")
-    with col5:
-        st.write("**Primary IT Partner**")
-    with col6:
-        st.write("**Action**")
+    # Create HTML table with proper styling
+    table_html = """
+    <style>
+    .accounts-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-family: 'Source Sans Pro', sans-serif;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .accounts-table th {
+        background-color: #f0f2f6;
+        padding: 15px 12px;
+        text-align: center;
+        vertical-align: middle;
+        font-weight: bold;
+        border-bottom: 2px solid #e6e6e6;
+        font-size: 14px;
+    }
+    .accounts-table td {
+        padding: 15px 12px;
+        text-align: center;
+        vertical-align: middle;
+        border-bottom: 1px solid #e6e6e6;
+        font-size: 14px;
+    }
+    .accounts-table tr:hover {
+        background-color: #f8f9fa;
+    }
+    .accounts-table tr:nth-child(even) {
+        background-color: #fafafa;
+    }
+    </style>
     
-    st.divider()
+    <table class="accounts-table">
+        <thead>
+            <tr>
+                <th style="width: 20%">Team</th>
+                <th style="width: 20%">Business Area</th>
+                <th style="width: 20%">VP</th>
+                <th style="width: 20%">Admin</th>
+                <th style="width: 20%">Primary IT Partner</th>
+            </tr>
+        </thead>
+        <tbody>
+    """
     
-    # Create clickable rows
     for idx, account in enumerate(accounts):
-        col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 2, 2, 1])
-        
-        with col1:
-            st.write(account['team'])
-        with col2:
-            st.write(account['business_area'])
-        with col3:
-            st.write(account['vp'])
-        with col4:
-            st.write(account['admin'])
-        with col5:
-            st.write(account['primary_it_partner'])
-        with col6:
-            if st.button("View", key=f"view_{account['bsnid']}"):
+        table_html += f"""
+            <tr>
+                <td>{account['team']}</td>
+                <td>{account['business_area']}</td>
+                <td>{account['vp']}</td>
+                <td>{account['admin']}</td>
+                <td>{account['primary_it_partner']}</td>
+            </tr>
+        """
+    
+    table_html += """
+        </tbody>
+    </table>
+    """
+    
+    st.markdown(table_html, unsafe_allow_html=True)
+    
+    # Streamlit buttons for account selection
+    st.markdown("**Select an account to view details:**")
+    cols = st.columns(min(len(accounts), 3))
+    for idx, account in enumerate(accounts):
+        with cols[idx % 3]:
+            if st.button(f"View {account['team']}", key=f"view_{account['bsnid']}", use_container_width=True):
                 st.session_state.selected_account = account['bsnid']
                 st.switch_page("pages/1_Account_Details.py")
-        
-        st.divider()
 
 else:
     if search_term:
