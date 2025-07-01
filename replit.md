@@ -21,7 +21,7 @@ This is a Streamlit-based Customer Relationship Management (CRM) system designed
 
 ### Application Structure
 ```
-├── 0_All_Accounts.py         # Main application entry point (All Accounts view)
+├── app.py                   # Main application entry point (All Accounts view)
 ├── pages/
 │   ├── 1_Account_Details.py  # Account detail view
 │   ├── 2_Use_Cases.py       # Use case management
@@ -105,7 +105,7 @@ This is a Streamlit-based Customer Relationship Management (CRM) system designed
 - **Address**: Bound to 0.0.0.0 for external access
 
 ### Workflow Configuration
-- **Run Command**: `streamlit run 0_All_Accounts.py --server.port 5000`
+- **Run Command**: `streamlit run app.py --server.port 5000`
 - **Mode**: Parallel execution with port waiting
 - **Button**: Project-level run button configuration
 
@@ -130,6 +130,7 @@ This is a Streamlit-based Customer Relationship Management (CRM) system designed
 - July 1, 2025. Implemented deployment-compatible navigation system with fallback mechanisms: added try-catch navigation logic to handle differences between preview and deployed environments, created full app.py implementation with navigation fallback handling, ensured consistent functionality across both development and production deployments
 - July 1, 2025. Replaced complex navigation fallbacks with JavaScript redirect approach: implemented window.location.href redirect to root URL for all "Back to All Accounts" buttons, providing reliable navigation that works consistently in both preview and deployed environments
 - July 1, 2025. Reverted to consistent app.py navigation approach: simplified all "Back to All Accounts" buttons to use st.switch_page("app.py") since deployment configuration uses app.py as main entry point, ensuring consistent navigation behavior across preview and deployed environments
+- July 1, 2025. Fully reverted to app.py as main application file: renamed 0_All_Accounts.py to backup_all_accounts.py, recreated app.py as the primary main file, updated workflow configuration to run app.py, ensuring complete consistency between preview and deployment environments
 
 ## User Preferences
 
