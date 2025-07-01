@@ -23,52 +23,64 @@ search_term = st.text_input("Search accounts by team, business area, VP, admin, 
 accounts = search_accounts(search_term)
 
 if accounts:
-    # Display accounts using a styled dataframe for better vertical centering
+    # Display accounts in a custom table with buttons in the rightmost column
     st.subheader(f"Accounts ({len(accounts)} found)")
     
-    # Add CSS for dataframe styling
+    # Add CSS for column alignment
     st.markdown("""
     <style>
-    /* Style the dataframe for better vertical centering */
-    .dataframe td, .dataframe th {
-        text-align: center !important;
-        vertical-align: middle !important;
-        padding: 12px !important;
+    /* Center align columns */
+    div[data-testid="column"] {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 50px;
     }
-    .dataframe th {
-        background-color: #f0f2f6 !important;
-        font-weight: bold !important;
-    }
-    .dataframe {
-        font-size: 14px !important;
+    div[data-testid="column"] p {
+        text-align: center;
+        margin: 0;
     }
     </style>
     """, unsafe_allow_html=True)
     
-    # Create dataframe for display
-    df_display = pd.DataFrame([
-        {
-            'Team': account['team'],
-            'Business Area': account['business_area'],
-            'VP': account['vp'],
-            'Admin': account['admin'],
-            'Primary IT Partner': account['primary_it_partner']
-        }
-        for account in accounts
-    ])
+    # Create header row
+    col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 2, 2, 1])
+    with col1:
+        st.markdown("**Team**")
+    with col2:
+        st.markdown("**Business Area**")
+    with col3:
+        st.markdown("**VP**")
+    with col4:
+        st.markdown("**Admin**")
+    with col5:
+        st.markdown("**Primary IT Partner**")
+    with col6:
+        st.markdown("**Action**")
     
-    # Display the dataframe
-    st.dataframe(df_display, use_container_width=True, hide_index=True)
+    st.divider()
     
-    # Account selection buttons
-    st.markdown("---")
-    st.markdown("**Select an account to view details:**")
-    cols = st.columns(min(len(accounts), 3))
+    # Create data rows with buttons
     for idx, account in enumerate(accounts):
-        with cols[idx % 3]:
-            if st.button(f"View {account['team']}", key=f"view_{account['bsnid']}", use_container_width=True):
+        col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 2, 2, 1])
+        
+        with col1:
+            st.markdown(f"<div style='text-align: center; padding: 8px;'>{account['team']}</div>", unsafe_allow_html=True)
+        with col2:
+            st.markdown(f"<div style='text-align: center; padding: 8px;'>{account['business_area']}</div>", unsafe_allow_html=True)
+        with col3:
+            st.markdown(f"<div style='text-align: center; padding: 8px;'>{account['vp']}</div>", unsafe_allow_html=True)
+        with col4:
+            st.markdown(f"<div style='text-align: center; padding: 8px;'>{account['admin']}</div>", unsafe_allow_html=True)
+        with col5:
+            st.markdown(f"<div style='text-align: center; padding: 8px;'>{account['primary_it_partner']}</div>", unsafe_allow_html=True)
+        with col6:
+            if st.button("View", key=f"view_{account['bsnid']}", use_container_width=True):
                 st.session_state.selected_account = account['bsnid']
                 st.switch_page("pages/1_Account_Details.py")
+        
+        if idx < len(accounts) - 1:  # Don't add divider after last row
+            st.divider()
 
 else:
     if search_term:
