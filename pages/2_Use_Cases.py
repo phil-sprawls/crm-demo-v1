@@ -23,9 +23,18 @@ if 'use_case_success_message' in st.session_state:
     st.success(st.session_state.use_case_success_message)
     del st.session_state.use_case_success_message
 
-# Back button
+# Back button - using deployment-compatible navigation
 if st.button("← Back to All Accounts"):
-    st.switch_page("0_All_Accounts.py")
+    # Try multiple navigation approaches for deployment compatibility
+    try:
+        st.switch_page("0_All_Accounts.py")
+    except:
+        try:
+            st.switch_page("app.py")
+        except:
+            # Fallback - use rerun with navigation flag
+            st.session_state.navigate_to_home = True
+            st.rerun()
 
 st.markdown("---")
 

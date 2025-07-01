@@ -12,7 +12,14 @@ st.set_page_config(
 # Initialize data
 initialize_data()
 
-
+# Handle navigation fallback from deployment compatibility
+if 'navigate_to_home' in st.session_state:
+    del st.session_state.navigate_to_home
+    # Clear any selection states to ensure clean home page
+    if 'selected_account' in st.session_state:
+        del st.session_state.selected_account
+    if 'edit_use_case_id' in st.session_state:
+        del st.session_state.edit_use_case_id
 
 st.title("EDIP CRM - All Accounts")
 
