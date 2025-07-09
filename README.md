@@ -77,7 +77,23 @@ Built with:
 
 ## Deployment
 
+### Replit Deployment
 Configured for deployment on Replit with autoscale support. The application runs on port 5000 and is accessible via web browser.
+
+### Databricks Apps Deployment
+The application is fully compatible with Databricks Apps for enterprise deployment:
+
+1. **Create App**: In Databricks workspace, click + New → Apps
+2. **Upload Files**: Use the provided project structure
+3. **Dependencies**: Use `databricks-requirements.txt` for package requirements
+4. **Deploy**: Follow the comprehensive guide in `DATABRICKS_DEPLOYMENT.md`
+
+**Databricks Benefits:**
+- Serverless hosting with automatic scaling
+- Enterprise security and authentication
+- Unity Catalog integration (optional)
+- Built-in monitoring and logging
+- Multi-user access control
 
 ## License
 
