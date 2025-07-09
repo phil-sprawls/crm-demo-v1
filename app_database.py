@@ -4,6 +4,10 @@ import uuid
 from datetime import datetime, date
 from databricks import sql
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Databricks Unity Catalog Test Deployment
 st.set_page_config(
