@@ -87,19 +87,14 @@ def initialize_test_database():
     
     try:
         with conn.cursor() as cursor:
-            st.info("Creating test catalog and schema...")
-            
-            # Create catalog
-            cursor.execute("CREATE CATALOG IF NOT EXISTS edip_crm_test")
-            st.success("✅ Test catalog created")
-            
-            # Create schema
-            cursor.execute("CREATE SCHEMA IF NOT EXISTS edip_crm_test.main")
-            st.success("✅ Test schema created")
+            st.info("Using existing catalog and schema...")
+            st.info("Catalog: corporate_information_technology_raw_dev_000")
+            st.info("Schema: developer_psprawls")
+            st.success("✅ Using authorized catalog and schema")
             
             # Create accounts table
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS edip_crm_test.main.accounts (
+                CREATE TABLE IF NOT EXISTS corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_accounts (
                     bsnid STRING,
                     team STRING,
                     business_area STRING,
@@ -116,7 +111,7 @@ def initialize_test_database():
             
             # Create platforms_status table
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS edip_crm_test.main.platforms_status (
+                CREATE TABLE IF NOT EXISTS corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_platforms_status (
                     id STRING,
                     account_bsnid STRING,
                     platform STRING,
@@ -129,7 +124,7 @@ def initialize_test_database():
             
             # Create use_cases table
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS edip_crm_test.main.use_cases (
+                CREATE TABLE IF NOT EXISTS corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_use_cases (
                     id STRING,
                     account_bsnid STRING,
                     problem STRING,
@@ -146,7 +141,7 @@ def initialize_test_database():
             
             # Create updates table
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS edip_crm_test.main.updates (
+                CREATE TABLE IF NOT EXISTS corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_updates (
                     id STRING,
                     account_bsnid STRING,
                     author STRING,
@@ -174,7 +169,7 @@ def load_test_data():
     try:
         with conn.cursor() as cursor:
             # Check if data exists
-            cursor.execute("SELECT COUNT(*) FROM edip_crm_test.main.accounts")
+            cursor.execute("SELECT COUNT(*) FROM corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_accounts")
             result = cursor.fetchone()
             
             if result[0] > 0:
@@ -194,7 +189,7 @@ def load_test_data():
             
             for account in test_accounts:
                 cursor.execute("""
-                    INSERT INTO edip_crm_test.main.accounts 
+                    INSERT INTO corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_accounts 
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, account + (current_time, current_time))
             
@@ -208,14 +203,14 @@ def load_test_data():
             for platform in test_platforms:
                 platform_id = str(uuid.uuid4())
                 cursor.execute("""
-                    INSERT INTO edip_crm_test.main.platforms_status 
+                    INSERT INTO corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_platforms_status 
                     VALUES (?, ?, ?, ?, ?, ?)
                 """, (platform_id,) + platform + (current_time, current_time))
             
             # Sample use case
             use_case_id = str(uuid.uuid4())
             cursor.execute("""
-                INSERT INTO edip_crm_test.main.use_cases 
+                INSERT INTO corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_use_cases 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (use_case_id, 'TEST001', 'Test database integration performance',
                   'Verify Unity Catalog operations work correctly', 'Mike Chen',
@@ -224,7 +219,7 @@ def load_test_data():
             # Sample update
             update_id = str(uuid.uuid4())
             cursor.execute("""
-                INSERT INTO edip_crm_test.main.updates 
+                INSERT INTO corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_updates 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (update_id, 'TEST001', 'Test User', date.today(), 'Databricks',
                   'Database integration test completed successfully', current_time, current_time))
@@ -244,7 +239,7 @@ def get_test_accounts():
     
     try:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT * FROM edip_crm_test.main.accounts ORDER BY bsnid")
+            cursor.execute("SELECT * FROM corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_accounts ORDER BY bsnid")
             df = cursor.fetchall_arrow().to_pandas()
             return df
     except Exception as e:
@@ -264,7 +259,7 @@ def search_test_accounts(search_term):
         with conn.cursor() as cursor:
             search_pattern = f"%{search_term.lower()}%"
             cursor.execute("""
-                SELECT * FROM edip_crm_test.main.accounts 
+                SELECT * FROM corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_accounts 
                 WHERE LOWER(team) LIKE ? 
                    OR LOWER(business_area) LIKE ? 
                    OR LOWER(vp) LIKE ? 
@@ -286,7 +281,7 @@ def get_test_platforms(account_bsnid):
     try:
         with conn.cursor() as cursor:
             cursor.execute("""
-                SELECT platform, status FROM edip_crm_test.main.platforms_status 
+                SELECT platform, status FROM corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_platforms_status 
                 WHERE account_bsnid = ?
             """, (account_bsnid,))
             results = cursor.fetchall()
@@ -398,7 +393,7 @@ def main():
                 
                 for table in tables:
                     try:
-                        cursor.execute(f"SELECT COUNT(*) FROM edip_crm_test.main.{table}")
+                        cursor.execute(f"SELECT COUNT(*) FROM corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_{table}")
                         count = cursor.fetchone()[0]
                         st.metric(f"{table.replace('_', ' ').title()}", count)
                     except Exception as e:

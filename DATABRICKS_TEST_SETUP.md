@@ -185,6 +185,6 @@ If you encounter issues:
 
 ---
 
-**Test Environment:** `edip_crm_test` catalog
-**Production Environment:** `edip_crm` catalog (for later migration)
+**Test Environment:** `corporate_information_technology_raw_dev_000.developer_psprawls` schema
+**Production Environment:** Same schema (tables will be prefixed with `edip_crm_`)
 **Isolation:** Complete separation between test and production data
