@@ -1,3 +1,5 @@
-streamlit==1.46.1
-pandas==2.3.0
-uuid
+databricks-connect==16.0.0
+databricks-sdk==0.46.0
+databricks-sql-connector==4.0.0
+pandas==2.2.3
+streamlit==1.41.1
