@@ -17,24 +17,18 @@ st.set_page_config(
 def get_databricks_connection():
     """Get cached Databricks SQL connection with test configuration"""
     try:
-        # Environment variables (preferred for Databricks Apps)
+        # Read from environment variables directly
         server_hostname = os.getenv("DATABRICKS_SERVER_HOSTNAME")
         http_path = os.getenv("DATABRICKS_HTTP_PATH")
         access_token = os.getenv("DATABRICKS_TOKEN")
         
-        # Streamlit secrets fallback
-        if not all([server_hostname, http_path, access_token]):
-            try:
-                server_hostname = st.secrets["DATABRICKS_SERVER_HOSTNAME"]
-                http_path = st.secrets["DATABRICKS_HTTP_PATH"]
-                access_token = st.secrets["DATABRICKS_TOKEN"]
-            except KeyError as e:
-                st.error(f"Missing secret: {str(e)}")
-                st.info("Please configure your Databricks credentials in the app settings.")
-                return None
+        # Show what we found
+        st.info(f"Server Hostname: {server_hostname if server_hostname else 'Not found'}")
+        st.info(f"HTTP Path: {http_path if http_path else 'Not found'}")
+        st.info(f"Access Token: {'Found' if access_token else 'Not found'}")
         
         if not all([server_hostname, http_path, access_token]):
-            st.error("Database credentials not configured.")
+            st.error("Missing Databricks environment variables")
             st.info("""
             Required environment variables:
             - DATABRICKS_SERVER_HOSTNAME
