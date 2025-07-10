@@ -40,38 +40,69 @@ def get_databricks_connection():
             - DATABRICKS_TOKEN
             """)
             return None
-            
-        # Test connection
+        
+        # Add debugging for connection attempt
+        st.info("Attempting to connect to Databricks...")
+        
+        # Test connection with timeout and detailed error handling
         conn = sql.connect(
             server_hostname=server_hostname,
             http_path=http_path,
-            access_token=access_token
+            access_token=access_token,
+            _retry_delay_min=1,
+            _retry_delay_max=10,
+            _retry_delay_multiplier=2,
+            _retry_stop_after_attempts_count=3
         )
         
-        # Verify connection works
+        st.info("Connection object created, testing query...")
+        
+        # Verify connection works with timeout
         with conn.cursor() as cursor:
             cursor.execute("SELECT 1 as test")
-            cursor.fetchone()
+            result = cursor.fetchone()
+            st.success(f"Connection test successful: {result}")
         
         return conn
         
+    except sql.Error as e:
+        st.error(f"Databricks SQL Error: {str(e)}")
+        st.info("This usually indicates an issue with SQL warehouse or credentials")
+        return None
     except Exception as e:
-        st.error(f"Database connection failed: {str(e)}")
+        st.error(f"Connection failed: {str(e)}")
         st.info("Please check your Databricks workspace connection and credentials.")
         return None
 
 def test_database_connection():
     """Test and display connection status"""
+    st.info("Starting connection test...")
+    
+    # Clear any cached connection first
+    if st.button("Clear Connection Cache"):
+        st.cache_resource.clear()
+        st.rerun()
+    
     conn = get_databricks_connection()
     if conn:
         st.success("✅ Database connection successful!")
         try:
+            st.info("Testing additional queries...")
             with conn.cursor() as cursor:
-                cursor.execute("SELECT current_user() as user, current_database() as db")
+                # Test basic queries
+                cursor.execute("SELECT current_user() as user, current_database() as db, current_timestamp() as time")
                 result = cursor.fetchone()
-                st.info(f"Connected as: {result[0]} | Database: {result[1]}")
+                st.info(f"Connected as: {result[0]}")
+                st.info(f"Current database: {result[1]}")
+                st.info(f"Server time: {result[2]}")
+                
+                # Test catalog access
+                cursor.execute("SHOW CATALOGS")
+                catalogs = cursor.fetchall()
+                st.info(f"Available catalogs: {len(catalogs)} found")
+                
         except Exception as e:
-            st.warning(f"Connection test query failed: {str(e)}")
+            st.warning(f"Additional test queries failed: {str(e)}")
         return True
     else:
         st.error("❌ Database connection failed")
