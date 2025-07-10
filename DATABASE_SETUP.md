@@ -12,7 +12,14 @@
 ## Quick Setup
 
 ### 1. Configure Environment Variables
-Edit the `.env` file with your actual Databricks credentials:
+Create your `.env` file from the template and add your actual Databricks credentials:
+
+```bash
+# Copy the template to create your .env file
+cp .env.template .env
+```
+
+Then edit the `.env` file with your actual values:
 
 ```env
 DATABRICKS_SERVER_HOSTNAME=adb-udap-cdp-npe-ws.cloud.databricks.com
