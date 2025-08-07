@@ -84,7 +84,7 @@ Dear [Admin],
 I need Unity Catalog permissions for the EDIP CRM database integration:
 
 User: [your-email@company.com]
-Workspace: adb-udap-cdp-npe-ws
+Workspace: [your-workspace-name]
 Catalog: corporate_information_technology_raw_dev_000  
 Schema: developer_psprawls
 

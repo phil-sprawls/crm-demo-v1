@@ -89,7 +89,7 @@ Token prefix: {access_token[:10] + '...' if access_token and len(access_token) >
     # Test basic connectivity
     try:
         import socket
-        hostname = server_hostname.replace('.cloud.databricks.com', '')
+        hostname = server_hostname
         st.info(f"Testing basic connectivity to {server_hostname}...")
         
         # This is a basic connectivity test

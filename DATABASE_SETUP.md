@@ -22,7 +22,7 @@ cp .env.template .env
 Then edit the `.env` file with your actual values:
 
 ```env
-DATABRICKS_SERVER_HOSTNAME=adb-udap-cdp-npe-ws.cloud.databricks.com
+DATABRICKS_SERVER_HOSTNAME=your-workspace.cloud.databricks.com
 DATABRICKS_HTTP_PATH=/sql/1.0/warehouses/your-actual-warehouse-id
 DATABRICKS_TOKEN=your-actual-access-token
 ```
