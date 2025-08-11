@@ -3,7 +3,7 @@
 ## Your Specific Configuration
 
 ### Workspace Details
-- **Workspace:** `adb-udap-cdp-npe-ws`
+- **Workspace:** `[your-workspace-name]`
 - **Catalog:** `corporate_information_technology_raw_dev_000`
 - **Schema:** `developer_psprawls`
 
@@ -11,7 +11,7 @@
 You need to gather these 3 pieces of information:
 
 1. **DATABRICKS_SERVER_HOSTNAME**
-   - Value: `adb-udap-cdp-npe-ws.cloud.databricks.com`
+   - Value: `your-workspace.cloud.databricks.com`
 
 2. **DATABRICKS_HTTP_PATH**
    - Go to SQL Warehouses in your workspace

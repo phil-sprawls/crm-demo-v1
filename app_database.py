@@ -9,6 +9,11 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+# Get database configuration from environment
+CATALOG_NAME = os.getenv("DATABRICKS_CATALOG", "corporate_information_technology_raw_dev_000")
+SCHEMA_NAME = os.getenv("DATABRICKS_SCHEMA", "developer_psprawls")
+TABLE_PREFIX = os.getenv("DATABRICKS_TABLE_PREFIX", "edip_crm")
+
 # Databricks Unity Catalog Test Deployment
 st.set_page_config(
     page_title="EDIP CRM System - Database Test",
@@ -117,13 +122,13 @@ def initialize_test_database():
     try:
         with conn.cursor() as cursor:
             st.info("Using existing catalog and schema...")
-            st.info("Catalog: corporate_information_technology_raw_dev_000")
-            st.info("Schema: developer_psprawls")
+            st.info(f"Catalog: {CATALOG_NAME}")
+            st.info(f"Schema: {SCHEMA_NAME}")
             st.success("✅ Using authorized catalog and schema")
             
             # Create accounts table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_accounts (
+            cursor.execute(f"""
+                CREATE TABLE IF NOT EXISTS {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_accounts (
                     bsnid STRING,
                     team STRING,
                     business_area STRING,
@@ -139,8 +144,8 @@ def initialize_test_database():
             st.success("✅ Accounts table created")
             
             # Create platforms_status table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_platforms_status (
+            cursor.execute(f"""
+                CREATE TABLE IF NOT EXISTS {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_platforms_status (
                     id STRING,
                     account_bsnid STRING,
                     platform STRING,
@@ -152,8 +157,8 @@ def initialize_test_database():
             st.success("✅ Platform status table created")
             
             # Create use_cases table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_use_cases (
+            cursor.execute(f"""
+                CREATE TABLE IF NOT EXISTS {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_use_cases (
                     id STRING,
                     account_bsnid STRING,
                     problem STRING,
@@ -169,8 +174,8 @@ def initialize_test_database():
             st.success("✅ Use cases table created")
             
             # Create updates table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_updates (
+            cursor.execute(f"""
+                CREATE TABLE IF NOT EXISTS {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_updates (
                     id STRING,
                     account_bsnid STRING,
                     author STRING,
@@ -198,7 +203,7 @@ def load_test_data():
     try:
         with conn.cursor() as cursor:
             # Check if data exists
-            cursor.execute("SELECT COUNT(*) FROM corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_accounts")
+            cursor.execute(f"SELECT COUNT(*) FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_accounts")
             result = cursor.fetchone()
             
             if result[0] > 0:
@@ -217,8 +222,8 @@ def load_test_data():
             ]
             
             for account in test_accounts:
-                cursor.execute("""
-                    INSERT INTO corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_accounts 
+                cursor.execute(f"""
+                    INSERT INTO {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_accounts 
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, account + (current_time, current_time))
             
@@ -231,15 +236,15 @@ def load_test_data():
             
             for platform in test_platforms:
                 platform_id = str(uuid.uuid4())
-                cursor.execute("""
-                    INSERT INTO corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_platforms_status 
+                cursor.execute(f"""
+                    INSERT INTO {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_platforms_status 
                     VALUES (?, ?, ?, ?, ?, ?)
                 """, (platform_id,) + platform + (current_time, current_time))
             
             # Sample use case
             use_case_id = str(uuid.uuid4())
-            cursor.execute("""
-                INSERT INTO corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_use_cases 
+            cursor.execute(f"""
+                INSERT INTO {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_use_cases 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (use_case_id, 'TEST001', 'Test database integration performance',
                   'Verify Unity Catalog operations work correctly', 'Mike Chen',
@@ -247,8 +252,8 @@ def load_test_data():
             
             # Sample update
             update_id = str(uuid.uuid4())
-            cursor.execute("""
-                INSERT INTO corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_updates 
+            cursor.execute(f"""
+                INSERT INTO {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_updates 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (update_id, 'TEST001', 'Test User', date.today(), 'Databricks',
                   'Database integration test completed successfully', current_time, current_time))
@@ -268,7 +273,7 @@ def get_test_accounts():
     
     try:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT * FROM corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_accounts ORDER BY bsnid")
+            cursor.execute(f"SELECT * FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_accounts ORDER BY bsnid")
             df = cursor.fetchall_arrow().to_pandas()
             return df
     except Exception as e:
@@ -287,8 +292,8 @@ def search_test_accounts(search_term):
     try:
         with conn.cursor() as cursor:
             search_pattern = f"%{search_term.lower()}%"
-            cursor.execute("""
-                SELECT * FROM corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_accounts 
+            cursor.execute(f"""
+                SELECT * FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_accounts 
                 WHERE LOWER(team) LIKE ? 
                    OR LOWER(business_area) LIKE ? 
                    OR LOWER(vp) LIKE ? 
@@ -309,8 +314,8 @@ def get_test_platforms(account_bsnid):
     
     try:
         with conn.cursor() as cursor:
-            cursor.execute("""
-                SELECT platform, status FROM corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_platforms_status 
+            cursor.execute(f"""
+                SELECT platform, status FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_platforms_status 
                 WHERE account_bsnid = ?
             """, (account_bsnid,))
             results = cursor.fetchall()
@@ -422,7 +427,7 @@ def main():
                 
                 for table in tables:
                     try:
-                        cursor.execute(f"SELECT COUNT(*) FROM corporate_information_technology_raw_dev_000.developer_psprawls.edip_crm_{table}")
+                        cursor.execute(f"SELECT COUNT(*) FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_{table}")
                         count = cursor.fetchone()[0]
                         st.metric(f"{table.replace('_', ' ').title()}", count)
                     except Exception as e:

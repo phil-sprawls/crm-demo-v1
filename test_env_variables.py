@@ -40,7 +40,7 @@ else:
 st.write("## Set Environment Variables:")
 st.code("""
 # If using shell/terminal:
-export DATABRICKS_SERVER_HOSTNAME="adb-udap-cdp-npe-ws.cloud.databricks.com"
+export DATABRICKS_SERVER_HOSTNAME="your-workspace.cloud.databricks.com"
 export DATABRICKS_HTTP_PATH="/sql/1.0/warehouses/your-warehouse-id"
 export DATABRICKS_TOKEN="your-access-token"
 

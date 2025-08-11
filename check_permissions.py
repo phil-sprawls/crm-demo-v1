@@ -80,17 +80,21 @@ if st.button("Check All Permissions"):
             
             # Check target catalog and schema
             try:
-                cursor.execute("USE CATALOG corporate_information_technology_raw_dev_000")
-                st.success("✅ Can USE target catalog")
+                # Get database configuration from environment
+                catalog_name = os.getenv("DATABRICKS_CATALOG", "corporate_information_technology_raw_dev_000")
+                schema_name = os.getenv("DATABRICKS_SCHEMA", "developer_psprawls")
+                
+                cursor.execute(f"USE CATALOG {catalog_name}")
+                st.success(f"✅ Can USE target catalog: {catalog_name}")
                 
                 cursor.execute("SHOW SCHEMAS")
                 schemas = cursor.fetchall()
                 schema_names = [row[0] for row in schemas]
                 
-                if 'developer_psprawls' in schema_names:
-                    st.success("✅ **Target schema found:** developer_psprawls")
+                if schema_name in schema_names:
+                    st.success(f"✅ **Target schema found:** {schema_name}")
                 else:
-                    st.error("❌ Target schema 'developer_psprawls' not accessible")
+                    st.error(f"❌ Target schema '{schema_name}' not accessible")
                     st.write("Available schemas:", schema_names)
                     
             except Exception as e:
@@ -100,7 +104,7 @@ if st.button("Check All Permissions"):
             
             # Test table creation in target schema
             try:
-                cursor.execute("USE SCHEMA corporate_information_technology_raw_dev_000.developer_psprawls")
+                cursor.execute(f"USE SCHEMA {catalog_name}.{schema_name}")
                 st.success("✅ Can USE target schema")
                 
                 # Try to create a test table
@@ -144,7 +148,7 @@ if st.button("Check All Permissions"):
             
             # Check if CRM tables already exist
             try:
-                cursor.execute("SHOW TABLES IN corporate_information_technology_raw_dev_000.developer_psprawls")
+                cursor.execute(f"SHOW TABLES IN {catalog_name}.{schema_name}")
                 tables = cursor.fetchall()
                 table_names = [row[1] for row in tables]  # Table name is in second column
                 
@@ -156,7 +160,7 @@ if st.button("Check All Permissions"):
                     # Test access to existing tables
                     for table in crm_tables:
                         try:
-                            cursor.execute(f"SELECT COUNT(*) FROM corporate_information_technology_raw_dev_000.developer_psprawls.{table}")
+                            cursor.execute(f"SELECT COUNT(*) FROM {catalog_name}.{schema_name}.{table}")
                             count = cursor.fetchone()[0]
                             st.success(f"✅ Can access {table}: {count} records")
                         except Exception as e:

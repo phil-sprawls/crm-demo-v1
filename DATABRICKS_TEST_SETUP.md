@@ -38,8 +38,8 @@ This test deployment allows you to safely validate the Unity Catalog database in
 You'll need these three pieces of information from your Databricks workspace:
 
 1. **Server Hostname**
-   - Your workspace: `adb-udap-cdp-npe-ws`
-   - The hostname is: `adb-udap-cdp-npe-ws.cloud.databricks.com`
+   - Your workspace: `[your-workspace-name]`
+   - The hostname is: `your-workspace.cloud.databricks.com`
 
 2. **SQL Warehouse HTTP Path**
    - In Databricks, go to SQL Warehouses
@@ -68,7 +68,7 @@ You'll need these three pieces of information from your Databricks workspace:
 3. **Configure Secrets**
    In the app settings, add these environment variables:
    ```
-   DATABRICKS_SERVER_HOSTNAME = adb-udap-cdp-npe-ws.cloud.databricks.com
+   DATABRICKS_SERVER_HOSTNAME = your-workspace.cloud.databricks.com
    DATABRICKS_HTTP_PATH = /sql/1.0/warehouses/your-warehouse-id
    DATABRICKS_TOKEN = your-personal-access-token
    ```
