@@ -7,13 +7,16 @@ echo "Setting up database version of EDIP CRM..."
 echo "Creating backups..."
 cp app.py app_backup.py
 cp -r .streamlit .streamlit_backup
-cp requirements.txt requirements_backup.txt 2>/dev/null || echo "No requirements.txt to backup"
+cp pyproject.toml pyproject_backup.toml
 
 # Replace with database versions
 echo "Replacing files with database versions..."
 cp app_database.py app.py
 cp -r .streamlit_database/* .streamlit/
 cp requirements_database.txt requirements.txt
+
+# Create backup note
+echo "Original project uses pyproject.toml for dependencies" > .database_version_active
 
 echo "Database version setup complete!"
 echo ""
