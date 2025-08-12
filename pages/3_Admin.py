@@ -177,10 +177,6 @@ DATABRICKS_SCHEMA=your_schema_name
 DATABRICKS_TABLE_PREFIX=edip_crm
         """)
         st.write("Add these to your `.env` file to connect to your database.")
-    st.markdown("---")
-    st.subheader("Add New Business Area")
-    
-    with st.form("add_business_area_form"):
         col1, col2 = st.columns(2)
         
         with col1:

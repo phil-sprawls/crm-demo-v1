@@ -22,7 +22,11 @@ def get_databricks_connection():
         http_path = os.getenv("DATABRICKS_HTTP_PATH")
         access_token = os.getenv("DATABRICKS_TOKEN")
         
-        if not all([server_hostname, http_path, access_token]):
+        # Check for placeholder values
+        if not all([server_hostname, http_path, access_token]) or \
+           "your-workspace" in server_hostname or \
+           "your-warehouse-id-here" in http_path or \
+           "your-access-token-here" in access_token:
             return None
             
         return sql.connect(
@@ -33,20 +37,91 @@ def get_databricks_connection():
     except Exception:
         return None
 
+def get_sample_accounts():
+    """Return sample account data when database is not available"""
+    return [
+        {
+            'bsnid': 'SAMPLE_001',
+            'team': 'Analytics Team',
+            'business_area': 'Data & Analytics',
+            'vp': 'Jane Smith',
+            'admin': 'John Doe',
+            'primary_it_partner': 'Data Platform Team'
+        },
+        {
+            'bsnid': 'SAMPLE_002', 
+            'team': 'Marketing Intelligence',
+            'business_area': 'Marketing',
+            'vp': 'Sarah Johnson',
+            'admin': 'Mike Wilson',
+            'primary_it_partner': 'Marketing Tech Team'
+        },
+        {
+            'bsnid': 'SAMPLE_003',
+            'team': 'Financial Reporting',
+            'business_area': 'Finance',
+            'vp': 'Robert Brown',
+            'admin': 'Lisa Davis',
+            'primary_it_partner': 'Finance IT Team'
+        }
+    ]
+
+def get_sample_account_detail(bsnid):
+    """Return sample account details for demo purposes"""
+    sample_accounts = {
+        'SAMPLE_001': {
+            'bsnid': 'SAMPLE_001',
+            'team': 'Analytics Team',
+            'business_area': 'Data & Analytics',
+            'vp': 'Jane Smith',
+            'admin': 'John Doe',
+            'primary_it_partner': 'Data Platform Team',
+            'azure_devops_links': ['https://dev.azure.com/sample/ticket1'],
+            'artifacts_folder_links': ['https://artifacts.example.com/analytics']
+        },
+        'SAMPLE_002': {
+            'bsnid': 'SAMPLE_002',
+            'team': 'Marketing Intelligence',
+            'business_area': 'Marketing', 
+            'vp': 'Sarah Johnson',
+            'admin': 'Mike Wilson',
+            'primary_it_partner': 'Marketing Tech Team',
+            'azure_devops_links': [],
+            'artifacts_folder_links': []
+        },
+        'SAMPLE_003': {
+            'bsnid': 'SAMPLE_003',
+            'team': 'Financial Reporting',
+            'business_area': 'Finance',
+            'vp': 'Robert Brown',
+            'admin': 'Lisa Davis', 
+            'primary_it_partner': 'Finance IT Team',
+            'azure_devops_links': ['https://dev.azure.com/sample/finance-ticket'],
+            'artifacts_folder_links': ['https://artifacts.example.com/finance']
+        }
+    }
+    return sample_accounts.get(bsnid)
+
 def get_account_by_bsnid(bsnid):
     """Get account details by BSNID"""
     conn = get_databricks_connection()
     if not conn:
-        return None
+        # Fallback to sample data when database is not connected
+        sample_account = get_sample_account_detail(bsnid)
+        if sample_account:
+            return sample_account
+        else:
+            return None
     
     try:
         with conn.cursor() as cursor:
-            cursor.execute(f"""
+            query = f"""
                 SELECT bsnid, team, business_area, vp, admin, primary_it_partner,
                        azure_devops_links, artifacts_folder_links
                 FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_accounts
                 WHERE bsnid = '{bsnid}'
-            """)
+            """
+            cursor.execute(query)
             result = cursor.fetchone()
             
             if result:
@@ -61,7 +136,7 @@ def get_account_by_bsnid(bsnid):
                     'artifacts_folder_links': result[7].split(',') if result[7] else []
                 }
             return None
-    except Exception:
+    except Exception as e:
         return None
 
 def get_account_use_cases(bsnid):
@@ -191,7 +266,8 @@ def get_all_accounts():
     """Get all accounts"""
     conn = get_databricks_connection()
     if not conn:
-        return []
+        # Return sample data when database is not connected
+        return get_sample_accounts()
     
     try:
         with conn.cursor() as cursor:
@@ -214,7 +290,8 @@ def get_all_accounts():
                 })
             return accounts
     except Exception:
-        return []
+        # Fallback to sample data on error
+        return get_sample_accounts()
 
 def get_all_use_cases():
     """Get all use cases"""
