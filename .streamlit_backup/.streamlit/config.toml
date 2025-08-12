@@ -1,10 +1,10 @@
+[server]
+headless = true
+address = "0.0.0.0"
+port = 5000
+
 [theme]
 primaryColor="#ff3621"
 backgroundColor="#f9f7f4"
 secondaryBackgroundColor="#eeede9"
 textColor="#1b3139"
-
-[server]
-headless = true
-address = "0.0.0.0"
-port = 5000
