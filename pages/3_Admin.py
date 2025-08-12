@@ -1,9 +1,16 @@
 import streamlit as st
 import pandas as pd
-from utils.data_manager import (
-    initialize_data, add_account, update_primary_it_partner, 
-    add_use_case, add_platform_to_account
-)
+from utils.database_manager import get_all_accounts, get_all_use_cases, get_databricks_connection
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Get database configuration
+CATALOG_NAME = os.getenv("DATABRICKS_CATALOG", "corporate_information_technology_raw_dev_000")
+SCHEMA_NAME = os.getenv("DATABRICKS_SCHEMA", "developer_psprawls")
+TABLE_PREFIX = os.getenv("DATABRICKS_TABLE_PREFIX", "edip_crm")
 
 # Page configuration
 st.set_page_config(
@@ -12,15 +19,11 @@ st.set_page_config(
     layout="wide"
 )
 
-# Initialize data
-initialize_data()
-
 st.title("Admin Panel")
 
 # Show persistent success message if exists
 if 'admin_success_message' in st.session_state:
     st.success(st.session_state.admin_success_message)
-    # Clear the message after showing it
     del st.session_state.admin_success_message
 
 # Back button
@@ -30,46 +33,150 @@ if st.button("← Back to All Accounts"):
 st.markdown("---")
 
 # Tab navigation for admin functions
-tab1, tab2, tab3, tab4 = st.tabs(["IT Partners", "Add Account", "Add Use Case", "Add Platform"])
+tab1, tab2, tab3, tab4 = st.tabs(["IT Partners", "Database Stats", "Account Management", "System Info"])
 
 # Tab 1: Primary IT Partners Management
 with tab1:
     st.subheader("Primary IT Partners by Business Area")
-    st.write("Manage the primary IT partner assignments for each business area.")
+    st.write("Current IT partner assignments from database")
     
-    # Display current assignments
-    st.write("**Current Assignments:**")
-    partners_df = pd.DataFrame([
-        {"Business Area": ba, "Primary IT Partner": partner} 
-        for ba, partner in st.session_state.business_areas.items()
-    ])
-    st.dataframe(partners_df, use_container_width=True)
+    # Get IT partners from database
+    conn = get_databricks_connection()
+    if conn:
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(f"""
+                    SELECT DISTINCT business_area, primary_it_partner
+                    FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_accounts
+                    ORDER BY business_area
+                """)
+                results = cursor.fetchall()
+                
+                if results:
+                    partners_df = pd.DataFrame(results, columns=["Business Area", "Primary IT Partner"])
+                    st.dataframe(partners_df, use_container_width=True)
+                else:
+                    st.info("No IT partner assignments found in database")
+                    
+        except Exception as e:
+            st.error(f"Could not load IT partner data: {str(e)}")
+    else:
+        st.error("Database connection not available")
+
+# Tab 2: Database Statistics
+with tab2:
+    st.subheader("Database Statistics")
+    st.write("Summary of data in your Databricks tables")
     
-    st.markdown("---")
+    conn = get_databricks_connection()
+    if conn:
+        try:
+            with conn.cursor() as cursor:
+                # Get account statistics
+                cursor.execute(f"SELECT COUNT(*) FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_accounts")
+                account_count = cursor.fetchone()[0]
+                
+                cursor.execute(f"SELECT COUNT(*) FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_use_cases")
+                use_case_count = cursor.fetchone()[0]
+                
+                cursor.execute(f"SELECT COUNT(*) FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_updates")
+                update_count = cursor.fetchone()[0]
+                
+                cursor.execute(f"SELECT COUNT(*) FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_platforms_status")
+                platform_status_count = cursor.fetchone()[0]
+                
+                # Display metrics
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.metric("Accounts", account_count)
+                with col2:
+                    st.metric("Use Cases", use_case_count)
+                with col3:
+                    st.metric("Updates", update_count)
+                with col4:
+                    st.metric("Platform Statuses", platform_status_count)
+                
+                st.markdown("---")
+                
+                # Business area breakdown
+                st.write("**Accounts by Business Area:**")
+                cursor.execute(f"""
+                    SELECT business_area, COUNT(*) as count
+                    FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_accounts
+                    GROUP BY business_area
+                    ORDER BY count DESC
+                """)
+                business_area_stats = cursor.fetchall()
+                
+                if business_area_stats:
+                    ba_df = pd.DataFrame(business_area_stats, columns=["Business Area", "Account Count"])
+                    st.dataframe(ba_df, use_container_width=True)
+                
+        except Exception as e:
+            st.error(f"Could not load database statistics: {str(e)}")
+    else:
+        st.error("Database connection not available")
+
+# Tab 3: Account Management 
+with tab3:
+    st.subheader("Account Overview")
+    st.write("View all accounts from database")
     
-    # Update IT Partner form
-    st.subheader("Update IT Partner Assignment")
+    accounts = get_all_accounts()
+    if accounts:
+        accounts_df = pd.DataFrame(accounts)
+        st.dataframe(accounts_df, use_container_width=True)
+    else:
+        st.info("No accounts found in database")
+
+# Tab 4: System Information
+with tab4:
+    st.subheader("System Information")
+    st.write("Database connection and configuration details")
     
-    with st.form("update_partner_form"):
-        col1, col2 = st.columns(2)
+    st.write("**Environment Configuration:**")
+    st.write(f"- Catalog: `{CATALOG_NAME}`")
+    st.write(f"- Schema: `{SCHEMA_NAME}`") 
+    st.write(f"- Table Prefix: `{TABLE_PREFIX}`")
+    
+    # Test database connection
+    conn = get_databricks_connection()
+    if conn:
+        st.success("✅ Database connection successful")
         
-        with col1:
-            business_area = st.selectbox("Business Area", list(st.session_state.business_areas.keys()))
-            current_partner = st.session_state.business_areas[business_area]
-            st.write(f"**Current Partner:** {current_partner}")
-        
-        with col2:
-            new_partner = st.text_input("New Primary IT Partner", value=current_partner)
-        
-        if st.form_submit_button("Update IT Partner", use_container_width=True):
-            if new_partner:
-                update_primary_it_partner(business_area, new_partner)
-                st.session_state.admin_success_message = f"✅ Primary IT Partner for {business_area} has been successfully updated to {new_partner}!"
-                st.rerun()
-            else:
-                st.error("Please enter a partner name")
-    
-    # Add new business area
+        # Show table information
+        try:
+            with conn.cursor() as cursor:
+                st.write("**Available Tables:**")
+                cursor.execute(f"""
+                    SELECT table_name 
+                    FROM information_schema.tables 
+                    WHERE table_schema = '{SCHEMA_NAME}' 
+                    AND table_name LIKE '{TABLE_PREFIX}_%'
+                """)
+                tables = cursor.fetchall()
+                
+                if tables:
+                    for table in tables:
+                        st.write(f"- {table[0]}")
+                else:
+                    st.write("No matching tables found")
+                        
+        except Exception as e:
+            st.warning(f"Could not retrieve table information: {str(e)}")
+            
+    else:
+        st.error("❌ Database connection failed")
+        st.write("**Required Environment Variables:**")
+        st.code("""
+DATABRICKS_SERVER_HOSTNAME=your-workspace.cloud.databricks.com
+DATABRICKS_HTTP_PATH=/sql/1.0/warehouses/your-warehouse-id  
+DATABRICKS_TOKEN=your-access-token
+DATABRICKS_CATALOG=your_catalog_name
+DATABRICKS_SCHEMA=your_schema_name
+DATABRICKS_TABLE_PREFIX=edip_crm
+        """)
+        st.write("Add these to your `.env` file to connect to your database.")
     st.markdown("---")
     st.subheader("Add New Business Area")
     
