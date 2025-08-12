@@ -40,10 +40,30 @@ DATABRICKS_TOKEN=your-access-token
     st.stop()
 
 # Get the selected account from database
-account = get_account_by_bsnid(st.session_state.selected_account)
+bsnid = st.session_state.selected_account
+st.write(f"Looking for account: {bsnid}")
+
+# Show what accounts are available in database
+conn = get_databricks_connection()
+if conn:
+    try:
+        with conn.cursor() as cursor:
+            from utils.database_manager import CATALOG_NAME, SCHEMA_NAME, TABLE_PREFIX
+            cursor.execute(f"""
+                SELECT bsnid, team FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_accounts
+                LIMIT 10
+            """)
+            available_accounts = cursor.fetchall()
+            st.write("Available accounts in database:")
+            for acc in available_accounts:
+                st.write(f"- BSNID: {acc[0]}, Team: {acc[1]}")
+    except Exception as e:
+        st.error(f"Error checking available accounts: {e}")
+
+account = get_account_by_bsnid(bsnid)
 if not account:
-    st.error(f"Account with BSNID '{st.session_state.selected_account}' not found in database.")
-    st.info("This could mean the account doesn't exist or there's a database permission issue.")
+    st.error(f"Account with BSNID '{bsnid}' not found in database.")
+    st.info("The account either doesn't exist or the database credentials are not properly configured.")
     if st.button("← Back to All Accounts"):
         st.switch_page("app.py")
     st.stop()
