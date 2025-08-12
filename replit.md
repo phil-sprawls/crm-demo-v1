@@ -14,10 +14,9 @@ This is a Streamlit-based Customer Relationship Management (CRM) system designed
 - **Navigation**: Page-based navigation using Streamlit's native page switching
 
 ### Backend Architecture
-- **Data Storage**: Databricks Unity Catalog database with persistent storage
-- **Database Connection**: databricks-sql-connector for enterprise-grade connectivity
-- **Data Management**: Centralized database operations with ACID transaction support
-- **State Management**: Database-backed persistence with multi-user support
+- **Data Storage**: In-memory storage using Streamlit's session state
+- **Data Management**: Centralized data manager utility (`utils/data_manager.py`)
+- **State Management**: Session-based state persistence during user sessions
 - **UUID Generation**: Automatic unique identifier generation for accounts and use cases
 
 ### Application Structure
@@ -82,10 +81,8 @@ This is a Streamlit-based Customer Relationship Management (CRM) system designed
 ## External Dependencies
 
 ### Core Dependencies
-- **Streamlit (>=1.41.1)**: Web application framework and UI components
-- **Pandas (>=2.2.3)**: Data manipulation and tabular data handling
-- **databricks-sql-connector (4.0.0)**: Enterprise database connectivity to Databricks Unity Catalog
-- **python-dotenv (1.0.0)**: Environment variable management for secure credential handling
+- **Streamlit (>=1.46.1)**: Web application framework and UI components
+- **Pandas (>=2.3.0)**: Data manipulation and tabular data handling
 - **UUID**: Built-in Python library for unique identifier generation
 - **Datetime**: Built-in Python library for timestamp management
 
@@ -112,12 +109,11 @@ This is a Streamlit-based Customer Relationship Management (CRM) system designed
 - **Mode**: Parallel execution with port waiting
 - **Button**: Project-level run button configuration
 
-### Database Features
-- **Data Persistence**: Full Unity Catalog database persistence across sessions
-- **Multi-user Support**: Shared database enables concurrent user access
-- **Enterprise Security**: Leverages Databricks authentication and authorization
-- **ACID Transactions**: Database operations with enterprise-grade reliability
-- **Audit Trails**: Automatic timestamps and change tracking
+### Limitations
+- **Data Persistence**: No permanent data storage - data is lost when session ends
+- **Multi-user**: No concurrent user support - single session application
+- **Authentication**: No user authentication or authorization system
+- **Database**: No external database integration
 
 ## Changelog
 
@@ -141,7 +137,6 @@ This is a Streamlit-based Customer Relationship Management (CRM) system designed
 - July 10, 2025. Enhanced database connection troubleshooting: created comprehensive permission checker (check_permissions.py) and connection debugger (debug_connection.py) to systematically identify Unity Catalog access issues, added detailed permissions guide with admin request templates, removed workspace references from code for privacy protection
 - July 10, 2025. Implemented environment variable configuration system: removed all hardcoded workspace names and database references from code, added DATABRICKS_CATALOG, DATABRICKS_SCHEMA, and DATABRICKS_TABLE_PREFIX environment variables to .env.template, updated all SQL queries to use configurable parameters while maintaining secure defaults
 - August 11, 2025. Fixed Streamlit startup failure: resolved app initialization issue by adding proper server configuration to .streamlit/config.toml with headless=true, address="0.0.0.0", and port=5000 settings, enabling successful CRM application startup
-- August 11, 2025. Upgraded main application to database-backed version: replaced app.py with database-integrated version, installed databricks-sql-connector and python-dotenv dependencies, migrated from in-memory session storage to persistent Databricks Unity Catalog database with full multi-user support and enterprise features
 
 ## User Preferences
 
