@@ -212,7 +212,7 @@ st.sidebar.markdown("""
 st.sidebar.markdown("---")
 st.sidebar.subheader("System Stats")
 
-# Get database stats
+# Database connection status and stats
 conn = get_databricks_connection()
 if conn:
     try:
@@ -233,8 +233,12 @@ if conn:
             st.sidebar.metric("Business Areas", business_area_count)
             
     except Exception as e:
-        st.sidebar.error("Could not load stats")
-        st.sidebar.markdown("---")
-        st.sidebar.subheader("Platform Distribution")
-        for platform, count in platform_counts.items():
-            st.sidebar.write(f"**{platform}**: {count} accounts")
+        st.sidebar.error("Database query failed")
+        st.sidebar.error(str(e))
+else:
+    st.sidebar.error("❌ Database Connection Failed")
+    st.sidebar.write("Update your .env file with real values:")
+    st.sidebar.code("""
+DATABRICKS_HTTP_PATH=/sql/1.0/warehouses/your-actual-warehouse-id
+DATABRICKS_TOKEN=your-actual-access-token
+    """)

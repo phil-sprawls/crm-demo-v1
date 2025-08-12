@@ -22,11 +22,7 @@ def get_databricks_connection():
         http_path = os.getenv("DATABRICKS_HTTP_PATH")
         access_token = os.getenv("DATABRICKS_TOKEN")
         
-        # Check for placeholder values
-        if not all([server_hostname, http_path, access_token]) or \
-           "your-workspace" in server_hostname or \
-           "your-warehouse-id-here" in http_path or \
-           "your-access-token-here" in access_token:
+        if not all([server_hostname, http_path, access_token]):
             return None
             
         return sql.connect(
@@ -34,7 +30,8 @@ def get_databricks_connection():
             http_path=http_path,
             access_token=access_token
         )
-    except Exception:
+    except Exception as e:
+        st.error(f"Database connection error: {str(e)}")
         return None
 
 def get_sample_accounts():
@@ -106,12 +103,7 @@ def get_account_by_bsnid(bsnid):
     """Get account details by BSNID"""
     conn = get_databricks_connection()
     if not conn:
-        # Fallback to sample data when database is not connected
-        sample_account = get_sample_account_detail(bsnid)
-        if sample_account:
-            return sample_account
-        else:
-            return None
+        return None
     
     try:
         with conn.cursor() as cursor:
@@ -266,8 +258,7 @@ def get_all_accounts():
     """Get all accounts"""
     conn = get_databricks_connection()
     if not conn:
-        # Return sample data when database is not connected
-        return get_sample_accounts()
+        return []
     
     try:
         with conn.cursor() as cursor:
@@ -289,9 +280,9 @@ def get_all_accounts():
                     'primary_it_partner': row[5]
                 })
             return accounts
-    except Exception:
-        # Fallback to sample data on error
-        return get_sample_accounts()
+    except Exception as e:
+        st.error(f"Database query error: {str(e)}")
+        return []
 
 def get_all_use_cases():
     """Get all use cases"""

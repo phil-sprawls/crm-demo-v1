@@ -1,122 +1,100 @@
-import streamlit as st
+#!/usr/bin/env python3
+"""
+Debug script to test Databricks connection
+Run this to verify your database credentials work
+"""
 import os
-from databricks import sql
 from dotenv import load_dotenv
-import time
+from databricks import sql
 
 # Load environment variables
 load_dotenv()
 
-st.title("Databricks Connection Debug Tool")
-
-# Show environment variables
-st.header("1. Environment Variables Check")
-server_hostname = os.getenv("DATABRICKS_SERVER_HOSTNAME")
-http_path = os.getenv("DATABRICKS_HTTP_PATH")
-access_token = os.getenv("DATABRICKS_TOKEN")
-
-st.write(f"**Server Hostname:** {server_hostname}")
-st.write(f"**HTTP Path:** {http_path}")
-st.write(f"**Access Token:** {'Set' if access_token else 'Not set'} ({'Length: ' + str(len(access_token)) if access_token else 'None'})")
-
-if st.button("Test Connection Step by Step"):
-    if not all([server_hostname, http_path, access_token]):
-        st.error("Missing required environment variables")
-        st.stop()
+def test_connection():
+    print("=== Databricks Connection Test ===\n")
     
-    try:
-        st.info("Step 1: Creating connection object...")
-        start_time = time.time()
+    # Check environment variables
+    server_hostname = os.getenv("DATABRICKS_SERVER_HOSTNAME")
+    http_path = os.getenv("DATABRICKS_HTTP_PATH") 
+    access_token = os.getenv("DATABRICKS_TOKEN")
+    catalog = os.getenv("DATABRICKS_CATALOG", "corporate_information_technology_raw_dev_000")
+    schema = os.getenv("DATABRICKS_SCHEMA", "developer_psprawls")
+    table_prefix = os.getenv("DATABRICKS_TABLE_PREFIX", "edip_crm")
+    
+    print("Environment Variables:")
+    print(f"  DATABRICKS_SERVER_HOSTNAME: {server_hostname}")
+    print(f"  DATABRICKS_HTTP_PATH: {http_path}")
+    print(f"  DATABRICKS_TOKEN: {'Set' if access_token else 'Not set'}")
+    print(f"  DATABRICKS_CATALOG: {catalog}")
+    print(f"  DATABRICKS_SCHEMA: {schema}")
+    print(f"  TABLE_PREFIX: {table_prefix}\n")
+    
+    # Check for missing credentials
+    if not all([server_hostname, http_path, access_token]):
+        print("❌ Missing required credentials in .env file")
+        print("Please update your .env file with:")
+        print("- DATABRICKS_SERVER_HOSTNAME")
+        print("- DATABRICKS_HTTP_PATH") 
+        print("- DATABRICKS_TOKEN")
+        return False
         
+    # Check for placeholder values
+    if ("your-warehouse-id-here" in http_path or 
+        "your-access-token-here" in access_token):
+        print("❌ Found placeholder values in .env file")
+        print("Please replace placeholder values with your actual credentials")
+        return False
+    
+    # Test database connection
+    print("Testing database connection...")
+    try:
         conn = sql.connect(
             server_hostname=server_hostname,
             http_path=http_path,
             access_token=access_token
         )
+        print("✅ Database connection successful!")
         
-        connection_time = time.time() - start_time
-        st.success(f"✅ Connection object created in {connection_time:.2f} seconds")
+        # Test table access
+        print("\nTesting table access...")
+        with conn.cursor() as cursor:
+            try:
+                cursor.execute(f"SELECT COUNT(*) FROM {catalog}.{schema}.{table_prefix}_accounts")
+                result = cursor.fetchone()
+                account_count = result[0] if result else 0
+                print(f"✅ Found {account_count} accounts in {catalog}.{schema}.{table_prefix}_accounts")
+                
+                cursor.execute(f"SELECT COUNT(*) FROM {catalog}.{schema}.{table_prefix}_use_cases")
+                result = cursor.fetchone()
+                use_case_count = result[0] if result else 0
+                print(f"✅ Found {use_case_count} use cases in {catalog}.{schema}.{table_prefix}_use_cases")
+                
+                cursor.execute(f"SELECT COUNT(*) FROM {catalog}.{schema}.{table_prefix}_updates")
+                result = cursor.fetchone()
+                update_count = result[0] if result else 0
+                print(f"✅ Found {update_count} updates in {catalog}.{schema}.{table_prefix}_updates")
+                
+                print("\n🎉 All tables accessible! Your CRM should work correctly.")
+                return True
+                
+            except Exception as e:
+                print(f"❌ Table access failed: {str(e)}")
+                print("This usually means:")
+                print("- Tables don't exist in the specified catalog/schema")
+                print("- Your token doesn't have permissions to access the tables")
+                print("- Catalog/schema names are incorrect")
+                return False
         
-        st.info("Step 2: Creating cursor...")
-        start_time = time.time()
-        
-        cursor = conn.cursor()
-        
-        cursor_time = time.time() - start_time
-        st.success(f"✅ Cursor created in {cursor_time:.2f} seconds")
-        
-        st.info("Step 3: Executing test query...")
-        start_time = time.time()
-        
-        cursor.execute("SELECT 1 as test")
-        
-        query_time = time.time() - start_time
-        st.success(f"✅ Query executed in {query_time:.2f} seconds")
-        
-        st.info("Step 4: Fetching result...")
-        start_time = time.time()
-        
-        result = cursor.fetchone()
-        
-        fetch_time = time.time() - start_time
-        st.success(f"✅ Result fetched in {fetch_time:.2f} seconds: {result}")
-        
-        cursor.close()
         conn.close()
         
-        st.success("🎉 All connection steps completed successfully!")
-        
     except Exception as e:
-        st.error(f"❌ Connection failed at step: {str(e)}")
-        st.info("Common issues:")
-        st.info("- SQL warehouse not running")
-        st.info("- Incorrect HTTP path")
-        st.info("- Invalid access token")
-        st.info("- Network connectivity issues")
+        print(f"❌ Database connection failed: {str(e)}")
+        print("This usually means:")
+        print("- Server hostname is incorrect")
+        print("- HTTP path is incorrect") 
+        print("- Access token is invalid or expired")
+        print("- Network/firewall issues")
+        return False
 
-# Additional diagnostic information
-st.header("2. Diagnostic Information")
-
-if st.button("Show Detailed Diagnostics"):
-    st.write("**Environment Check:**")
-    st.code(f"""
-Server: {server_hostname}
-Path: {http_path}
-Token length: {len(access_token) if access_token else 0}
-Token prefix: {access_token[:10] + '...' if access_token and len(access_token) > 10 else 'N/A'}
-    """)
-    
-    # Test basic connectivity
-    try:
-        import socket
-        hostname = server_hostname
-        st.info(f"Testing basic connectivity to {server_hostname}...")
-        
-        # This is a basic connectivity test
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(5)
-        result = sock.connect_ex((server_hostname, 443))
-        sock.close()
-        
-        if result == 0:
-            st.success("✅ Basic network connectivity OK")
-        else:
-            st.error("❌ Network connectivity issue")
-            
-    except Exception as e:
-        st.warning(f"Network test failed: {str(e)}")
-
-st.header("3. Common Solutions")
-st.info("""
-**If connection is stuck/spinning:**
-1. Check if SQL warehouse is running in Databricks
-2. Verify HTTP path format: /sql/1.0/warehouses/[warehouse-id]
-3. Confirm access token is valid and has permissions
-4. Try restarting the SQL warehouse
-5. Check network connectivity to workspace
-
-**HTTP Path Format:**
-- Correct: /sql/1.0/warehouses/abc123def456
-- Incorrect: sql/1.0/warehouses/abc123def456 (missing leading slash)
-- Incorrect: /sql/warehouses/abc123def456 (missing version)
-""")
+if __name__ == "__main__":
+    test_connection()

@@ -25,10 +25,25 @@ if 'selected_account' not in st.session_state:
         st.switch_page("app.py")
     st.stop()
 
+# Test database connection first
+from utils.database_manager import get_databricks_connection
+conn = get_databricks_connection()
+if not conn:
+    st.error("Database connection failed. Please check your .env file configuration:")
+    st.code("""
+DATABRICKS_SERVER_HOSTNAME=your-workspace.cloud.databricks.com
+DATABRICKS_HTTP_PATH=/sql/1.0/warehouses/your-warehouse-id
+DATABRICKS_TOKEN=your-access-token
+    """)
+    if st.button("← Back to All Accounts"):
+        st.switch_page("app.py") 
+    st.stop()
+
 # Get the selected account from database
 account = get_account_by_bsnid(st.session_state.selected_account)
 if not account:
-    st.error("Account not found in database.")
+    st.error(f"Account with BSNID '{st.session_state.selected_account}' not found in database.")
+    st.info("This could mean the account doesn't exist or there's a database permission issue.")
     if st.button("← Back to All Accounts"):
         st.switch_page("app.py")
     st.stop()
