@@ -155,34 +155,51 @@ if st.session_state.get('show_add_form', False):
 accounts = get_all_accounts(search_term)
 
 if accounts:
-    # Convert to DataFrame for better display
-    df = pd.DataFrame(accounts)
-    
     st.write(f"**{len(accounts)} accounts found**")
     
-    # Display as interactive table
-    for i, account in enumerate(accounts):
-        with st.container():
-            col1, col2, col3, col4 = st.columns([2, 2, 2, 1])
-            
-            with col1:
-                st.write(f"**{account['bsnid']}**")
-                st.write(f"Team: {account['team']}")
-                
-            with col2:
-                st.write(f"Business Area: {account['business_area']}")
-                st.write(f"VP: {account['vp']}")
-                
-            with col3:
-                st.write(f"Admin: {account['admin']}")
-                st.write(f"IT Partner: {account['primary_it_partner']}")
-                
-            with col4:
-                if st.button("View", key=f"view_{account['bsnid']}"):
-                    st.session_state.selected_account = account['bsnid']
-                    st.switch_page("pages/1_Account_Details.py")
-            
-            st.divider()
+    # Create DataFrame for table display
+    display_data = []
+    for account in accounts:
+        display_data.append({
+            'BSNID': account['bsnid'],
+            'Team': account['team'],
+            'Business Area': account['business_area'],
+            'VP': account['vp'],
+            'Admin': account['admin'],
+            'IT Partner': account['primary_it_partner']
+        })
+    
+    df = pd.DataFrame(display_data)
+    
+    # Display table with custom CSS for alignment
+    st.markdown("""
+    <style>
+    .stDataFrame td {
+        text-align: left !important;
+    }
+    .stDataFrame th {
+        text-align: left !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Display the dataframe
+    st.dataframe(df, use_container_width=True, hide_index=True)
+    
+    # Account selection dropdown
+    st.subheader("Account Actions")
+    selected_bsnid = st.selectbox(
+        "Select an account to view details:",
+        options=[""] + [account['bsnid'] for account in accounts],
+        format_func=lambda x: "Choose an account..." if x == "" else f"{x} - {next(acc['team'] for acc in accounts if acc['bsnid'] == x)}"
+    )
+    
+    if selected_bsnid:
+        col1, col2, col3 = st.columns([1, 1, 4])
+        with col1:
+            if st.button("View Details"):
+                st.session_state.selected_account = selected_bsnid
+                st.switch_page("pages/1_Account_Details.py")
 else:
     if search_term:
         st.info("No accounts found matching your search criteria.")
