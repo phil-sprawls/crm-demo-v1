@@ -31,7 +31,6 @@ def get_databricks_connection():
         access_token = os.getenv("DATABRICKS_TOKEN")
         
         if not all([server_hostname, http_path, access_token]):
-            st.error("Missing Databricks environment variables. Please check your .env file.")
             return None
             
         return sql.connect(
@@ -39,8 +38,7 @@ def get_databricks_connection():
             http_path=http_path,
             access_token=access_token
         )
-    except Exception as e:
-        st.error(f"Failed to connect to Databricks: {str(e)}")
+    except Exception:
         return None
 
 # Database operations
@@ -203,10 +201,18 @@ def get_all_accounts(search_term=""):
         return []
 
 # Initialize database and load sample data
-if initialize_database_tables():
-    load_sample_data()
-else:
-    st.error("Failed to initialize database. Please check your connection.")
+@st.cache_data
+def setup_database():
+    """Setup database tables and sample data"""
+    if initialize_database_tables():
+        load_sample_data()
+        return True
+    return False
+
+# Check database setup
+if not setup_database():
+    st.error("Database connection required. Please ensure your .env file contains valid Databricks credentials.")
+    st.info("Required variables: DATABRICKS_SERVER_HOSTNAME, DATABRICKS_HTTP_PATH, DATABRICKS_TOKEN")
     st.stop()
 
 # Main application
