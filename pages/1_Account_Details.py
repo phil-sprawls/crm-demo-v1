@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
-from utils.data_manager import (
-    initialize_data, get_account_use_cases, get_account_updates, add_azure_devops_link, 
-    add_artifacts_folder_link, add_platform_to_account, update_platform_status
+from utils.database_manager import (
+    get_account_by_bsnid, get_account_use_cases, get_account_updates, get_platform_status
 )
 
 # Page configuration
@@ -12,9 +11,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# Initialize data
-initialize_data()
-
 st.title("Account Details")
 
 # Show persistent success message if exists
@@ -23,14 +19,19 @@ if 'account_success_message' in st.session_state:
     del st.session_state.account_success_message
 
 # Check if an account is selected
-if 'selected_account' not in st.session_state or st.session_state.selected_account not in st.session_state.accounts:
+if 'selected_account' not in st.session_state:
     st.error("No account selected. Please go back to All Accounts and select an account.")
     if st.button("← Back to All Accounts"):
         st.switch_page("app.py")
     st.stop()
 
-# Get the selected account
-account = st.session_state.accounts[st.session_state.selected_account]
+# Get the selected account from database
+account = get_account_by_bsnid(st.session_state.selected_account)
+if not account:
+    st.error("Account not found in database.")
+    if st.button("← Back to All Accounts"):
+        st.switch_page("app.py")
+    st.stop()
 
 # Back button
 if st.button("← Back to All Accounts"):
@@ -68,11 +69,13 @@ with col2:
     else:
         st.write("No Azure DevOps links available")
     
-    # Add new Azure DevOps link
-    with st.expander("Add Azure DevOps Link"):
-        new_azure_link = st.text_input("Azure DevOps URL", key="new_azure_link")
-        if st.button("Add Azure DevOps Link"):
-            if new_azure_link:
+    # Artifacts Folder Links
+    st.write("**Artifacts Folder Links:**")
+    if account['artifacts_folder_links']:
+        for i, link in enumerate(account['artifacts_folder_links']):
+            st.markdown(f"[Artifacts Folder {i+1}]({link})")
+    else:
+        st.write("No artifacts folder links available")
                 add_azure_devops_link(account['bsnid'], new_azure_link)
                 st.success("✅ Azure DevOps link has been successfully added to this account!")
                 st.rerun()

@@ -1,6 +1,18 @@
 import streamlit as st
 import pandas as pd
-from utils.data_manager import initialize_data, search_accounts, add_account
+import uuid
+from datetime import datetime, date
+from databricks import sql
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Get database configuration from environment
+CATALOG_NAME = os.getenv("DATABRICKS_CATALOG", "corporate_information_technology_raw_dev_000")
+SCHEMA_NAME = os.getenv("DATABRICKS_SCHEMA", "developer_psprawls")
+TABLE_PREFIX = os.getenv("DATABRICKS_TABLE_PREFIX", "edip_crm")
 
 # Page configuration
 st.set_page_config(
@@ -9,8 +21,71 @@ st.set_page_config(
     layout="wide"
 )
 
-# Initialize data
-initialize_data()
+# Database connection
+@st.cache_resource
+def get_databricks_connection():
+    """Get cached Databricks SQL connection"""
+    try:
+        server_hostname = os.getenv("DATABRICKS_SERVER_HOSTNAME")
+        http_path = os.getenv("DATABRICKS_HTTP_PATH")
+        access_token = os.getenv("DATABRICKS_TOKEN")
+        
+        if not all([server_hostname, http_path, access_token]):
+            st.error("Database connection not configured. Please check your environment variables.")
+            return None
+            
+        return sql.connect(
+            server_hostname=server_hostname,
+            http_path=http_path,
+            access_token=access_token
+        )
+    except Exception as e:
+        st.error(f"Database connection failed: {str(e)}")
+        return None
+
+def search_accounts(search_term=""):
+    """Search accounts from database"""
+    conn = get_databricks_connection()
+    if not conn:
+        return []
+    
+    try:
+        with conn.cursor() as cursor:
+            if search_term:
+                query = f"""
+                SELECT bsnid, team, business_area, vp, admin, primary_it_partner
+                FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_accounts
+                WHERE LOWER(team) LIKE LOWER('%{search_term}%')
+                   OR LOWER(business_area) LIKE LOWER('%{search_term}%')
+                   OR LOWER(vp) LIKE LOWER('%{search_term}%')
+                   OR LOWER(admin) LIKE LOWER('%{search_term}%')
+                   OR LOWER(primary_it_partner) LIKE LOWER('%{search_term}%')
+                ORDER BY team
+                """
+            else:
+                query = f"""
+                SELECT bsnid, team, business_area, vp, admin, primary_it_partner
+                FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_accounts
+                ORDER BY team
+                """
+            
+            cursor.execute(query)
+            results = cursor.fetchall()
+            
+            accounts = []
+            for row in results:
+                accounts.append({
+                    'bsnid': row[0],
+                    'team': row[1],
+                    'business_area': row[2],
+                    'vp': row[3],
+                    'admin': row[4],
+                    'primary_it_partner': row[5]
+                })
+            return accounts
+    except Exception as e:
+        st.error(f"Error searching accounts: {str(e)}")
+        return []
 
 st.title("EDIP CRM - All Accounts")
 
@@ -136,18 +211,29 @@ st.sidebar.markdown("""
 # System stats
 st.sidebar.markdown("---")
 st.sidebar.subheader("System Stats")
-st.sidebar.metric("Total Accounts", len(st.session_state.accounts))
-st.sidebar.metric("Total Use Cases", len(st.session_state.use_cases))
-st.sidebar.metric("Business Areas", len(st.session_state.business_areas))
 
-# Quick stats
-if st.session_state.accounts:
-    platform_counts = {}
-    for account in st.session_state.accounts.values():
-        for platform in account['platforms_status'].keys():
-            platform_counts[platform] = platform_counts.get(platform, 0) + 1
-    
-    if platform_counts:
+# Get database stats
+conn = get_databricks_connection()
+if conn:
+    try:
+        with conn.cursor() as cursor:
+            # Count accounts
+            cursor.execute(f"SELECT COUNT(*) FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_accounts")
+            account_count = cursor.fetchone()[0]
+            st.sidebar.metric("Total Accounts", account_count)
+            
+            # Count use cases
+            cursor.execute(f"SELECT COUNT(*) FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_use_cases")
+            use_case_count = cursor.fetchone()[0]
+            st.sidebar.metric("Total Use Cases", use_case_count)
+            
+            # Count business areas
+            cursor.execute(f"SELECT COUNT(DISTINCT business_area) FROM {CATALOG_NAME}.{SCHEMA_NAME}.{TABLE_PREFIX}_accounts")
+            business_area_count = cursor.fetchone()[0]
+            st.sidebar.metric("Business Areas", business_area_count)
+            
+    except Exception as e:
+        st.sidebar.error("Could not load stats")
         st.sidebar.markdown("---")
         st.sidebar.subheader("Platform Distribution")
         for platform, count in platform_counts.items():

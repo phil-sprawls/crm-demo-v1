@@ -137,6 +137,7 @@ This is a Streamlit-based Customer Relationship Management (CRM) system designed
 - July 10, 2025. Enhanced database connection troubleshooting: created comprehensive permission checker (check_permissions.py) and connection debugger (debug_connection.py) to systematically identify Unity Catalog access issues, added detailed permissions guide with admin request templates, removed workspace references from code for privacy protection
 - July 10, 2025. Implemented environment variable configuration system: removed all hardcoded workspace names and database references from code, added DATABRICKS_CATALOG, DATABRICKS_SCHEMA, and DATABRICKS_TABLE_PREFIX environment variables to .env.template, updated all SQL queries to use configurable parameters while maintaining secure defaults
 - August 11, 2025. Fixed Streamlit startup failure: resolved app initialization issue by adding proper server configuration to .streamlit/config.toml with headless=true, address="0.0.0.0", and port=5000 settings, enabling successful CRM application startup
+- August 11, 2025. Integrated Databricks backend: updated main app.py to connect to existing Databricks tables, replaced in-memory data manager with database_manager.py for direct SQL queries, app now reads from user's created database tables instead of session state
 
 ## User Preferences
 

@@ -1,9 +1,8 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-from utils.data_manager import (
-    initialize_data, add_use_case, update_use_case, get_account_use_cases,
-    add_update, get_account_updates, update_update
+from utils.database_manager import (
+    get_all_accounts, add_use_case, get_all_use_cases
 )
 
 # Page configuration
@@ -12,9 +11,6 @@ st.set_page_config(
     page_icon="📊",
     layout="wide"
 )
-
-# Initialize data
-initialize_data()
 
 st.title("Use Cases Management")
 
